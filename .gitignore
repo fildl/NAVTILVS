@@ -216,3 +216,27 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon files
+Icon
+Icon\r
+ehthumbs.db
+Thumbs.db
+
+# macOS metadata
+._*
+
+# Spotlight index
+.Spotlight-V100
+.Trashes
+
+# Folders that may appear on external drives
+.fseventsd
+.DocumentRevisions-V100
+.TemporaryItems
+.com.apple.timemachine.donotpresent
