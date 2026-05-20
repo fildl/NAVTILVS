@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+from plot import plot_stream
 
 def build_up_b(dx, dy,
                u, v,
@@ -103,42 +104,48 @@ def update_velocity(u, v,
 
     return u, v
 
-def NS_solver(u, v,
+def step(dx, dy, u, v, rho, dt):
+
+    un = u.copy()
+    vn = v.copy()
+
+    p = np.zeros_like(u)
+
+    b = build_up_b(dx, dy, u, v, rho, dt)
+    
+    p = pressure_poisson(p, dx, dy, b)
+
+    u, v = update_velocity(u, v,
+                           un, vn,
+                           dt,
+                           dx, dy,
+                           p,
+                           rho,
+                           nu)
+
+    # boundary conditions
+    u[0, :]  = 0
+    u[:, 0]  = 0
+    u[:, -1] = 0
+    u[-1, :] = 1  # set velocity on cavity lid equal to 1
+    v[0, :]  = 0
+    v[-1, :] = 0
+    v[:, 0]  = 0
+    v[:, -1] = 0
+
+    return u, v, p
+
+def NS_solver(u, v, p,
               dx, dy,
               nx, ny,
               rho,
               nu,
               nt, dt
               ):
-    
-    b = np.zeros((ny, nx))
-    p = np.zeros((ny, nx))
 
     for n in range(nt):
 
-        un = u.copy()
-        vn = v.copy()
-
-        b = build_up_b(dx, dy, u, v, rho, dt)
-        p = pressure_poisson(p, dx, dy, b)
-
-        u, v = update_velocity(u, v,
-                               un, vn,
-                               dt,
-                               dx, dy,
-                               p,
-                               rho,
-                               nu)
-                               
-        # boundary conditions
-        u[0, :]  = 0
-        u[:, 0]  = 0
-        u[:, -1] = 0
-        u[-1, :] = 1  # set velocity on cavity lid equal to 1
-        v[0, :]  = 0
-        v[-1, :] = 0
-        v[:, 0]  = 0
-        v[:, -1] = 0
+        u, v, p = step(dx, dy, u, v, rho, dt)
 
     return u, v, p
 
@@ -156,6 +163,7 @@ DT = 0.001
 
 u = np.zeros((NY, NX))
 v = np.zeros((NY, NX))
+p = np.zeros((NY, NX))
 
 dx = LX / (NX - 1)
 dy = LY / (NY - 1)
@@ -163,7 +171,7 @@ dy = LY / (NY - 1)
 rho = 1    # fluid density
 nu = 0.1  # kinematic viscosity
 
-u, v, p = NS_solver(u = u, v = v,
+u, v, p = NS_solver(u = u, v = v, p = p,
                     dx = dx, dy = dy,
                     nx = NX, ny = NY,
                     rho = rho,
@@ -171,3 +179,14 @@ u, v, p = NS_solver(u = u, v = v,
                     nt = NT,
                     dt = DT
                     )
+
+plot_stream(u = u,
+            v = v,
+            p = p,
+            lx = LX,
+            ly = LY,
+            nx = NX,
+            ny = NY,
+            rho = rho,
+            nu = nu
+            )
