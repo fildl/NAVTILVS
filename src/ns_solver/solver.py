@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def build_up_b(dx, dy,
                u, v,
                rho,
@@ -38,9 +37,15 @@ def build_up_b(dx, dy,
 
     return b
 
-def pressure_poisson(p, dx, dy, b, max_iter = 500):
+def pressure_poisson(p, dx, dy, b, boundary_conditions, max_iter = 500):
     """
     Solves the Poisson equation for pressure :math:`p`.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
     """
 
     for _ in range(max_iter):
@@ -54,10 +59,15 @@ def pressure_poisson(p, dx, dy, b, max_iter = 500):
                           b[1:-1,1:-1])
 
         # boundary conditions for cavity flow
-        p[:, -1] = p[:, -2]
-        p[0, :] = p[1, :]
-        p[:, 0] = p[:, 1]
-        p[-1, :] = 0  
+        p = boundary_conditions(p)
+
+    return p
+
+def cavity_flow_bc(p):
+    p[:, -1] = p[:, -2]
+    p[0, :] = p[1, :]
+    p[:, 0] = p[:, 1]
+    p[-1, :] = 0
 
     return p
 
@@ -111,7 +121,8 @@ def step(dx, dy, u, v, rho, nu, dt):
 
     b = build_up_b(dx, dy, u, v, rho, dt)
     
-    p = pressure_poisson(p, dx, dy, b)
+    p = pressure_poisson(p, dx, dy, b,
+                         boundary_conditions=cavity_flow_bc)
 
     u, v = update_velocity(u, v,
                            un, vn,
