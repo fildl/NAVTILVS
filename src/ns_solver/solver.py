@@ -1,7 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-from plot import plot_stream
+
 
 def build_up_b(dx, dy,
                u, v,
@@ -104,7 +102,7 @@ def update_velocity(u, v,
 
     return u, v
 
-def step(dx, dy, u, v, rho, dt):
+def step(dx, dy, u, v, rho, nu, dt):
 
     un = u.copy()
     vn = v.copy()
@@ -145,6 +143,6 @@ def NS_solver(u, v, p,
 
     for n in range(nt):
 
-        u, v, p = step(dx, dy, u, v, rho, dt)
+        u, v, p = step(dx, dy, u, v, rho, nu, dt)
 
     return u, v, p

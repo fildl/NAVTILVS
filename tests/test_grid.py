@@ -1,4 +1,4 @@
-from src.grid import Grid
+from ns_solver.grid import Grid
 import pytest
 
 def test_grid_creation():
