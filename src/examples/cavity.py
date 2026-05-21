@@ -2,7 +2,6 @@ import numpy as np
 from ns_solver.solver import NS_solver
 from plots.plot import plot_stream
 
-# Parametri geometrici e fisici del problema
 # Parameters
 # Geometric parameters
 NX = 41
