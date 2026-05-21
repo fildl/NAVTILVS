@@ -42,8 +42,24 @@ class Grid:
 
     @property
     def dx(self) -> float:
+        """
+        Define the grid spacing in the x-direction.
+
+        Returns
+        -------
+        float
+            Grid spacing in the x-direction.
+        """
         return self.lx / (self.nx - 1)
     
     @property
     def dy(self) -> float:
+        """
+        Define the grid spacing in the y-direction.
+
+        Returns
+        -------
+        float
+            Grid spacing in the y-direction.
+        """
         return self.ly / (self.ny - 1)

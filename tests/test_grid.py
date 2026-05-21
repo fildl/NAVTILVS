@@ -1,5 +1,7 @@
-from ns_solver.grid import Grid
 import pytest
+import math
+from ns_solver.grid import Grid
+TOLERANCE = 1e-5
 
 def test_grid_creation():
     """
@@ -13,7 +15,7 @@ def test_grid_creation():
     assert grid.nx == 10
     assert grid.ny == 10
 
-def test_grid_invalid_lengh():
+def test_grid_invalid_length():
     """
     Validate that negative grid lengths raise an error.
     """
@@ -25,6 +27,14 @@ def test_grid_invalid_lengh():
     # Test with negative grid length in y-direction
     with pytest.raises(ValueError):
         Grid(lx=1.0, ly=-1.0, nx=10, ny=10)
+
+    # Test with zero grid length in x-direction
+    with pytest.raises(ValueError):
+        Grid(lx=0, ly=1.0, nx=10, ny=10)
+
+    # Test with zero grid length in y-direction
+    with pytest.raises(ValueError):
+        Grid(lx=1.0, ly=0, nx=10, ny=10)
 
 def test_grid_invalid_number_of_grid_points():
     """
@@ -72,3 +82,28 @@ def test_grid_discretization():
 
     assert grid.dx == 1.0 / 9.0
     assert grid.dy == 1.0 / 9.0
+
+    grid = Grid(lx=1.0, ly=1.0, nx=128, ny=128)
+
+    assert math.isclose(grid.dx, 1.0 / 127.0, rel_tol=TOLERANCE)
+    assert math.isclose(grid.dy, 1.0 / 127.0, rel_tol=TOLERANCE)
+
+def test_grid_discretization_asymmetric_lenght():
+    """
+    Test if spatial discretization is correct with different grid lengths.
+    """
+
+    grid = Grid(lx=1.0, ly=5.0, nx=128, ny=128)
+
+    assert math.isclose(grid.dx, 1.0 / 127.0, rel_tol=TOLERANCE)
+    assert math.isclose(grid.dy, 5.0 / 127.0, rel_tol=TOLERANCE)
+
+def test_grid_discretization_asymmetric_grid_points():
+    """
+    Test if spatial discretization is correct with different grid points.
+    """
+
+    grid = Grid(lx=1.0, ly=1.0, nx=128, ny=256)
+
+    assert math.isclose(grid.dx, 1.0 / 127.0, rel_tol=TOLERANCE)
+    assert math.isclose(grid.dy, 1.0 / 255.0, rel_tol=TOLERANCE)
