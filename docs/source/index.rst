@@ -13,5 +13,6 @@ Welcome to the Navier Stokes Solver documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   theory
-   api
+   pages/welcome
+   pages/theory
+   pages/api
