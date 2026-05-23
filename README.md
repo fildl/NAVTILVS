@@ -1,6 +1,6 @@
-# NAVTILVS: **NAV**ier-Stokes **T**wo-dimensional **I**ncompressib**L**e **V**isual **S**olver
+# NAVTILVS
 
-NAVTILVS is a 2D incompressible Navier–Stokes solver written in Python.
+NAVTILVS (**NAV**ier-Stokes **T**wo-dimensional **I**ncompressib**L**e **V**isual **S**olver) is a 2D incompressible Navier–Stokes solver written in Python.
 
 ## Documentation
 
