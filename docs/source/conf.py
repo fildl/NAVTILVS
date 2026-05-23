@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Navier Stokes Solver'
+project = 'NAVTILVS'
 copyright = '2026, Filippo Di Ludovico'
 author = 'Filippo Di Ludovico'
 release = '0.1.0'
@@ -25,8 +25,6 @@ extensions = [
 
 templates_path = ['_templates']
 exclude_patterns = []
-
-
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

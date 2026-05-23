@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "navier-stokes-solver"
+name = "navtilvs"
 version = "0.1.0"
-description = "2D incompressible Navier–Stokes solver in Python"
+description = "NAVTILVS: NAVier-Stokes Two-dimensional IncompressibLe Visual Solver"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

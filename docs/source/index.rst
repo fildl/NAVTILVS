@@ -3,10 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Navier Stokes Solver documentation
-==================================
+NAVTILVS Documentation
+======================
 
-Welcome to the Navier Stokes Solver documentation!
+Welcome to the NAVTILVS documentation!
 
 
 .. toctree::
