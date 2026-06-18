@@ -1,10 +1,12 @@
 import numpy as np
 
-def build_up_b(dx, dy,
-               u, v,
-               rho,
-               dt
-               ):
+def build_up_b(dx : float,
+               dy : float,
+               u : np.ndarray,
+               v : np.ndarray,
+               rho : float,
+               dt : float
+               ) -> np.ndarray:
     """
     Compute the source term :math:`b` for the pressure Poisson equation.
 
@@ -16,6 +18,10 @@ def build_up_b(dx, dy,
         Grid spacing in the x-direction.
     dy : float
         Grid spacing in the y-direction.
+    u : np.ndarray
+        Velocity field in the x-direction.
+    v : np.ndarray
+        Velocity field in the y-direction.
     rho : float
         Fluid density.
     dt : float
@@ -23,7 +29,8 @@ def build_up_b(dx, dy,
 
     Returns
     -------
-
+    np.ndarray
+        2D array for the source term b.
     """
     b = np.zeros_like(u)
 
@@ -37,15 +44,35 @@ def build_up_b(dx, dy,
 
     return b
 
-def pressure_poisson(p, dx, dy, b, boundary_conditions, max_iter = 500):
+def pressure_poisson(p : np.ndarray,
+                     dx : float,
+                     dy : float,
+                     b : np.ndarray,
+                     boundary_conditions,
+                     max_iter : int = 500
+                     ) -> np.ndarray:
     """
     Solves the Poisson equation for pressure :math:`p`.
 
     Parameters
     ----------
+    p : np.ndarray
+        pressure field.
+    dx : float
+        Grid spacing in the x-direction.
+    dy : float
+        Grid spacing in the y-direction.
+    b : np.ndarray
+        Source term.
+    boundary_conditions : callable
+        Function to apply boundary conditions to the pressure field.
+    max_iter : int, optional
+        Maximum number of iterations (default is 500).
 
     Returns
     -------
+    np.ndarray
+        2D array for the solved pressure field.
     """
 
     for _ in range(max_iter):
@@ -58,31 +85,56 @@ def pressure_poisson(p, dx, dy, b, boundary_conditions, max_iter = 500):
                           dx**2 * dy**2 / (2 * (dx**2 + dy**2)) * 
                           b[1:-1,1:-1])
 
-        # boundary conditions for cavity flow
+        # Apply boundary conditions
         p = boundary_conditions(p)
 
     return p
 
-def cavity_flow_bc(p):
-    p[:, -1] = p[:, -2]
-    p[0, :] = p[1, :]
-    p[:, 0] = p[:, 1]
-    p[-1, :] = 0
-
-    return p
-
-def update_velocity(u, v,
-                    un, vn,
-                    dt,
-                    dx, dy,
-                    p,
-                    rho,
-                    nu):
+def update_velocity(u : np.ndarray,
+                    v : np.ndarray,
+                    un : np.ndarray,
+                    vn : np.ndarray,
+                    dt : float,
+                    dx : float,
+                    dy : float,
+                    p : np.ndarray,
+                    rho : float,
+                    nu : float
+                    ) -> tuple[np.ndarray, np.ndarray]:
     """
     Solve momentum equation for both components.
 
+    Discretizes the Navier-Stokes momentum equations using backward differences for convection
+    and central differences for diffusion.
+
+    
     Parameters
     ----------
+    u : np.ndarray
+        Velocity field in the x-direction.
+    v : np.ndarray
+        Velocity field in the y-direction.
+    un : np.ndarray
+        Velocity field in the x-direction at the previous time step.
+    vn : np.ndarray
+        Velocity field in the y-direction at the previous time step.
+    dt : float
+        Time step size.
+    dx : float
+        Grid spacing in the x-direction.
+    dy : float
+        Grid spacing in the y-direction.
+    p : np.ndarray
+        Pressure field.
+    rho : float
+        Fluid density.
+    nu : float
+        Kinematic viscosity.
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray]
+        Updated velocity fields (u, v).
 
     """
 
@@ -111,49 +163,3 @@ def update_velocity(u, v,
                        (vn[2:, 1:-1] - 2 * vn[1:-1, 1:-1] + vn[0:-2, 1:-1])))
 
     return u, v
-
-def step(dx, dy, u, v, rho, nu, dt):
-
-    un = u.copy()
-    vn = v.copy()
-
-    p = np.zeros_like(u)
-
-    b = build_up_b(dx, dy, u, v, rho, dt)
-    
-    p = pressure_poisson(p, dx, dy, b,
-                         boundary_conditions=cavity_flow_bc)
-
-    u, v = update_velocity(u, v,
-                           un, vn,
-                           dt,
-                           dx, dy,
-                           p,
-                           rho,
-                           nu)
-
-    # boundary conditions
-    u[0, :]  = 0
-    u[:, 0]  = 0
-    u[:, -1] = 0
-    u[-1, :] = 1  # set velocity on cavity lid equal to 1
-    v[0, :]  = 0
-    v[-1, :] = 0
-    v[:, 0]  = 0
-    v[:, -1] = 0
-
-    return u, v, p
-
-def NS_solver(u, v, p,
-              dx, dy,
-              nx, ny,
-              rho,
-              nu,
-              nt, dt
-              ):
-
-    for n in range(nt):
-
-        u, v, p = step(dx, dy, u, v, rho, nu, dt)
-
-    return u, v, p
