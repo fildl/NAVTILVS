@@ -27,9 +27,18 @@ class SimulationClass:
 
     def __post_init__(self):
         """
-        Initialize velocity and pressure fields.
+        Initialize velocity and pressure fields and validate inputs.
         """
 
+        # Check that parameters are valid
+        if self.rho <= 0:
+            raise ValueError("Density must be strictly positive.")
+        if self.nu <= 0:
+            raise ValueError("Viscosity must be strictly positive.")
+        if self.dt <= 0:
+            raise ValueError("Time step (dt) must be strictly positive.")
+
+        # Initialize velocity and pressure fields
         self.u = np.zeros((self.grid.ny, self.grid.nx))
         self.v = np.zeros((self.grid.ny, self.grid.nx))
         self.p = np.zeros((self.grid.ny, self.grid.nx))
