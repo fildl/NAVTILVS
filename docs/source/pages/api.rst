@@ -1,12 +1,11 @@
 Code Documentation (API)
 ========================
 
-.. automodule:: ns_solver.solver
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. toctree::
+   :maxdepth: 2
+   :caption: Modules:
 
-.. automodule:: ns_solver.grid
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   api/grid
+   api/solver
+   api/simulation
+   api/plots

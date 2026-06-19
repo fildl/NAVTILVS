@@ -23,6 +23,8 @@ extensions = [
     'sphinx.ext.napoleon',
 ]
 
+autodoc_member_order = 'bysource'
+
 templates_path = ['_templates']
 exclude_patterns = []
 
