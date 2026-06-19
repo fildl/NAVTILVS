@@ -1,14 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+from ns_solver.grid import Grid
 
 def plot_stream(u : np.ndarray,
                 v : np.ndarray,
                 p : np.ndarray,
-                lx : float,
-                ly : float,
-                nx : int,
-                ny : int,
+                grid : Grid,
                 rho : float,
                 nu : float
                 ) -> None:
@@ -27,14 +25,8 @@ def plot_stream(u : np.ndarray,
         Velocity field in the y-direction.
     p : np.ndarray
         Pressure field.
-    lx : float
-        Length of the domain in the x-direction.
-    ly : float
-        Length of the domain in the y-direction.
-    nx : int
-        Number of grid points in the x-direction.
-    ny : int
-        Number of grid points in the y-direction.
+    grid : Grid
+        Spatial grid of the simulation.
     rho : float
         Fluid density.
     nu : float
@@ -42,8 +34,8 @@ def plot_stream(u : np.ndarray,
     """
     
     # Create spatial coordinates
-    x = np.linspace(0, lx, nx)
-    y = np.linspace(0, ly, ny)
+    x = np.linspace(0, grid.lx, grid.nx)
+    y = np.linspace(0, grid.ly, grid.ny)
     X, Y = np.meshgrid(x, y)
 
     plt.figure(figsize=(11, 7), dpi=100)

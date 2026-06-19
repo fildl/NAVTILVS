@@ -24,8 +24,7 @@ u, v, p = simulation.solve(nt=500)
 # Plot
 plot_stream(
     u=u, v=v, p=p,
-    lx=grid.lx, ly=grid.ly,
-    nx=grid.nx, ny=grid.ny,
+    grid=grid,
     rho=RHO,
     nu=NU
 )
