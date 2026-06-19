@@ -75,15 +75,23 @@ def pressure_poisson(p : np.ndarray,
         2D array for the solved pressure field.
     """
 
+    # Precompute constants for efficiency
+    denom = 2 * (dx**2 + dy**2)
+    const_x = dy**2 / denom
+    const_y = dx**2 / denom
+    const_b = dx**2 * dy**2 / denom
+
+    # Pre-allocate array for pressure field
+    pn = np.empty_like(p)
+
     for _ in range(max_iter):
 
-        pn = p.copy()
+        # Copy current pressure field
+        np.copyto(pn, p)
 
-        p[1:-1, 1:-1] = (((pn[1:-1, 2:] + pn[1:-1, 0:-2]) * dy**2 + 
-                          (pn[2:, 1:-1] + pn[0:-2, 1:-1]) * dx**2) /
-                          (2 * (dx**2 + dy**2)) -
-                          dx**2 * dy**2 / (2 * (dx**2 + dy**2)) * 
-                          b[1:-1,1:-1])
+        p[1:-1, 1:-1] = ((pn[1:-1, 2:] + pn[1:-1, 0:-2]) * const_x +
+                         (pn[2:, 1:-1] + pn[0:-2, 1:-1]) * const_y -
+                         b[1:-1,1:-1] * const_b)
 
         # Apply boundary conditions
         p = boundary_conditions(p)
