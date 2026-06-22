@@ -1,6 +1,6 @@
 import pytest
 import math
-from ns_solver.grid import Grid
+from ns_solver import Grid
 
 TOLERANCE = 1e-5
 
