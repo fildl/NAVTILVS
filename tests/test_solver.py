@@ -1,0 +1,160 @@
+import pytest
+import math
+import numpy as np
+from ns_solver import build_up_b, pressure_poisson, update_velocity
+
+TOLERANCE = 1e-5
+
+def test_build_up_b_zero_velocity():
+    """
+    Verify that if the velocity fields are zero, the source term b is zero.
+    """
+
+    u = np.zeros((10, 10))
+    v = np.zeros((10, 10))
+    b = build_up_b(dx=0.1, dy=0.1, u=u, v=v, rho=1.0, dt=0.01)
+    
+    assert np.all(b == 0.0)
+
+def test_build_up_b_uniform_flow():
+    """
+    Verify that if the velocity fields are uniform, the source term b is zero, since spatial gradients are zero.
+    """
+
+    u = np.ones((10, 10))
+    v = np.ones((10, 10))
+    
+    b = build_up_b(dx=0.1, dy=0.1, u=u, v=v, rho=1.0, dt=0.01)
+    
+    assert np.all(b == 0.0)
+
+def test_build_up_b_shear_flow_u():
+    """
+    Verify that for a shear flow :math:`u=y`, the source term b is zero.
+    """
+
+    u = np.zeros((10, 10))
+    v = np.zeros((10, 10))
+    
+    # Shear flow: u increases linearly in y from 0 to 0.9
+    for i in range(10):
+        u[i, :] = i * 0.1
+    
+    b = build_up_b(dx=0.1, dy=0.1, u=u, v=v, rho=1.0, dt=0.01)
+    
+    assert np.all(b == 0.0)
+
+def test_build_up_b_shear_flow_v():
+    """
+    Verify that for a shear flow :math:`v=x`, the source term b is zero.
+    """
+
+    u = np.zeros((10, 10))
+    v = np.zeros((10, 10))
+    
+    # Shear flow: u increases linearly in y from 0 to 0.9
+    for j in range(10):
+        v[:, j] = j * 0.1
+    
+    b = build_up_b(dx=0.1, dy=0.1, u=u, v=v, rho=1.0, dt=0.01)
+    
+    assert np.all(b == 0.0)
+
+def test_build_up_b_linear_divergence():
+    """
+    Verify that for a linear divergence field, the source term b is computed correctly.
+    
+    Here, :math:`u=x` and :math:`v=y`, so that :math:`du/dx = 1`, :math:`dv/dy = 1`,
+    while cross terms :math:`du/dy = 0`, :math:`dv/dx = 0`.
+    The analytical source term is :math:`b = rho * ( 2/dt - 2 )`.
+
+    For rho = 1.0, dt = 0.5, we expect b = 2.0 on inner nodes.
+    """
+    nx, ny = 10, 10
+    dx, dy = 0.1, 0.2
+    
+    # Grid coordinates
+    x = np.arange(nx) * dx
+    y = np.arange(ny) * dy
+    X, Y = np.meshgrid(x, y)
+    
+    u = X
+    v = Y
+    
+    b = build_up_b(dx=dx, dy=dy, u=u, v=v, rho=1.0, dt=0.5)
+    
+    # Boundary nodes of b are initialized to 0 and remain 0.
+    # Check boundary nodes are zero
+    assert np.all(b[0, :]  == 0.0)
+    assert np.all(b[-1, :] == 0.0)
+    assert np.all(b[:, 0]  == 0.0)
+    assert np.all(b[:, -1] == 0.0)
+
+    # Check inner nodes: expected value is 2.0
+    assert np.allclose(b[1:-1, 1:-1], 2.0, rtol=TOLERANCE)
+
+def test_build_up_b_cross_shear():
+    """
+    Verify that for a cross shear field, the source term b is computed correctly.
+
+    Here, :math:`u=y` and :math:`v=x`, so that cross terms :math:`du/dy = 1`, :math:`dv/dx = 1`,
+    while :math:`du/dx = 0`, :math:`dv/dy = 0`.
+    The analytical source term is :math:`b = -2 * rho`.
+
+    For rho = 1.0, we expect b = -2.0 on inner nodes.
+    """
+    nx, ny = 10, 10
+    dx, dy = 0.1, 0.1
+    
+    # Grid coordinates
+    x = np.arange(nx) * dx
+    y = np.arange(ny) * dy
+    X, Y = np.meshgrid(x, y)
+    
+    u = Y
+    v = X
+    
+    b = build_up_b(dx=dx, dy=dy, u=u, v=v, rho=1.0, dt=0.1)
+    
+    # Boundary nodes of b are initialized to 0 and remain 0.
+    # Check boundary nodes are zero
+    assert np.all(b[0, :]  == 0.0)
+    assert np.all(b[-1, :] == 0.0)
+    assert np.all(b[:, 0]  == 0.0)
+    assert np.all(b[:, -1] == 0.0)
+
+    # Check inner nodes: expected value is -2.0
+    assert np.allclose(b[1:-1, 1:-1], -2.0, rtol=TOLERANCE)
+
+def test_pressure_poisson_flat():
+    """
+    Verify that if the source term :math:`b = 0` and pressure is constant at the boundaries,
+    i.e. the boundary conditions are identity,
+    pressure field remains constant (Poisson equation reduces to Laplace equation with zero source term).
+    """
+
+    p = np.ones((10, 10)) * 3.0
+    b = np.zeros((10, 10))
+    
+    def identity_bc(x):
+        return x
+        
+    p_new = pressure_poisson(p, dx=0.1, dy=0.1, b=b, boundary_conditions=identity_bc, max_iter=10)
+    
+    assert np.allclose(p_new, 3.0, rtol=TOLERANCE)
+
+def test_update_velocity_uniform_flow():
+    """
+    Verify that velocity updater preserves uniform flow fields in the absence of pressure gradients.
+    """
+
+    u = np.ones((10, 10))
+    v = np.zeros((10, 10))
+    un = np.ones((10, 10))
+    vn = np.zeros((10, 10))
+    p = np.zeros((10, 10))
+    
+    u, v = update_velocity(u, v, un, vn, dt=0.01, dx=0.1, dy=0.1, p=p, rho=1.0, nu=0.1)
+    
+    assert np.allclose(u[1:-1, 1:-1], 1.0, rtol=TOLERANCE)
+    assert np.allclose(v[1:-1, 1:-1], 0.0, rtol=TOLERANCE)
