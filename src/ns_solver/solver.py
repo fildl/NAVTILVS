@@ -114,7 +114,6 @@ def update_velocity(u : np.ndarray,
 
     Discretizes the Navier-Stokes momentum equations using backward differences for convection
     and central differences for diffusion.
-
     
     Parameters
     ----------
