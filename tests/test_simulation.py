@@ -1,12 +1,16 @@
 import pytest
+import math
 import numpy as np
 from ns_solver import Grid
 from ns_solver import SimulationClass, CavitySimulation
+TOLERANCE = 5e-5
 
 def test_simulation_invalid_inputs():
     """
     Check that SimulationClass raises errors for non-physical parameters.
     """
+    
+    # Create a grid
     grid = Grid(lx=1.0, ly=1.0, nx=10, ny=10)
     
     # Negative density
@@ -46,6 +50,37 @@ def test_simulation_initialization():
     assert np.all(sim.u == 0.0)
     assert np.all(sim.v == 0.0)
     assert np.all(sim.p == 0.0)
+
+def test_dynamic_time_stepping():
+    """
+    Test that the time step :math:`dt` is dynamically reduced if the input :math:`dt` is unstable.
+
+    For a 128x128 square grid with :math:`\\l=1.0` and :math:`\\nu=0.1`:
+    * the CFL stability limit is :math:`dt_{CFL} = 0.0019` and
+    * the viscous stability limit with safety factor 0.9 is :math:`dt_{visc} \\approx 0.0001395`.
+
+    We initialize the simulation with an unstable time step of :math:`dt=1.0` and verify that after one step,
+    the computed :math:`dt` is reduced to the viscous stability limit.
+    """
+
+    # Create a 128x128 grid
+    grid = Grid(lx=1.0, ly=1.0, nx=128, ny=128)
+    
+    # Initialize with dt = 1.0
+    sim = CavitySimulation(grid=grid, rho=1.0, nu=0.1, dt=1.0)
+    
+    assert sim.dt == 1.0
+    
+    # Compute one step
+    sim.step()
+    
+    # Verify that dt is reduced to the viscous stability limit
+    dx = grid.dx
+    dy = grid.dy
+    expected_dt_visc = 0.9 * (dx**2 * dy**2) / (2.0 * sim.nu * (dx**2 + dy**2))
+    
+    assert math.isclose(sim.dt, expected_dt_visc, rel_tol=TOLERANCE)
+    assert sim.dt > 0.0
 
 def test_simulation_base_bc_identity():
     """
