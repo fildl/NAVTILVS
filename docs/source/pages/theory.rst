@@ -52,3 +52,52 @@ Taking the divergence of the momentum equation leads to a Poisson equation for p
       2\frac{\partial u}{\partial y}\frac{\partial v}{\partial x} +
       \left(\frac{\partial v}{\partial y}\right)^2
       \right] = b
+
+.. _numerical_stability:
+
+Numerical Stability and Time Stepping
+-------------------------------------
+
+To ensure numerical stability of the explicit finite difference solver, the time step :math:`\Delta t` must satisfy stability criteria for both convection and diffusion.
+
+1. **Convective Stability (CFL Condition)**:
+   The Courant-Friedrichs-Lewy (CFL) condition ensures that physical information does not propagate faster than the grid speed:
+
+   .. math::
+      \Delta t_{cfl} = C_{cfl} \frac{1}{\frac{|u|_{max}}{\Delta x} + \frac{|v|_{max}}{\Delta y}}
+
+   where :math:`C_{cfl} < 1` is a safety factor (typically :math:`0.5`).
+
+2. **Viscous Stability (Diffusion Limit)**:
+   In a 1D diffusion equation, the explicit scheme is stable under the condition (Hirsch, 2007) [1]_:
+
+   .. math::
+      \frac{\nu \Delta t}{\Delta x^2} \le \frac{1}{2} \implies \Delta t \le \frac{\Delta x^2}{2\nu}
+
+   Extending the von Neumann stability analysis to a 2D grid yields:
+
+   .. math::
+      \nu \Delta t \left( \frac{1}{\Delta x^2} + \frac{1}{\Delta y^2} \right) \le \frac{1}{2}
+
+   This limits the viscous time step to:
+
+   .. math::
+      \Delta t_{visc} = C_{visc} \frac{\Delta x^2 \Delta y^2}{2 \nu (\Delta x^2 + \Delta y^2)}
+
+   where :math:`C_{visc} < 1` is a safety factor (typically :math:`0.9`).
+   
+   If the grid is isotropic (:math:`\Delta x = \Delta y`), the limit simplifies to 
+   
+   .. math::
+      \Delta t_{visc} \le \frac{\Delta x^2}{4\nu}
+
+To guarantee stable execution across all regimes, the active time step is dynamically computed at each step as:
+
+.. math::
+   \Delta t = \min(\Delta t_{cfl}, \Delta t_{visc})
+
+
+References
+----------
+
+.. [1] Hirsch, C. (2007). *Chapter 7 - Consistency, Stability and Error Analysis of Numerical Schemes*. In *Numerical Computation of Internal and External Flows (Second Edition)* (pp. 283-335). Oxford: Butterworth-Heinemann. doi: https://doi.org/10.1016/B978-075066594-0/50049-7
