@@ -1,6 +1,7 @@
 import pytest
 import math
 from ns_solver.grid import Grid
+
 TOLERANCE = 1e-5
 
 def test_grid_creation():
@@ -15,63 +16,37 @@ def test_grid_creation():
     assert grid.nx == 10
     assert grid.ny == 10
 
-def test_grid_invalid_length():
+@pytest.mark.parametrize("lx, ly, nx, ny", [
+    (-1.0, 1.0, 10, 10),  # Negative grid length in x-direction
+    (1.0, -1.0, 10, 10),  # Negative grid length in y-direction
+    (0, 1.0, 10, 10),     # Zero grid length in x-direction
+    (1.0, 0, 10, 10),     # Zero grid length in y-direction
+])
+def test_grid_invalid_length(lx, ly, nx, ny):
     """
-    Validate that negative grid lengths raise an error.
+    Validate that negative or zero grid lengths raise an error.
     """
 
-    # Test with negative grid length in x-direction
     with pytest.raises(ValueError):
-        Grid(lx=-1.0, ly=1.0, nx=10, ny=10)
+        Grid(lx=lx, ly=ly, nx=nx, ny=ny)
 
-    # Test with negative grid length in y-direction
-    with pytest.raises(ValueError):
-        Grid(lx=1.0, ly=-1.0, nx=10, ny=10)
-
-    # Test with zero grid length in x-direction
-    with pytest.raises(ValueError):
-        Grid(lx=0, ly=1.0, nx=10, ny=10)
-
-    # Test with zero grid length in y-direction
-    with pytest.raises(ValueError):
-        Grid(lx=1.0, ly=0, nx=10, ny=10)
-
-def test_grid_invalid_number_of_grid_points():
+@pytest.mark.parametrize("lx, ly, nx, ny, expected_exception", [
+    (1.0, 1.0, 1.0, 10, TypeError),   # Float grid points in x-direction
+    (1.0, 1.0, 10, 1.0, TypeError),   # Float grid points in y-direction
+    (1.0, 1.0, 1, 10, ValueError),    # Only 1 grid point in x-direction
+    (1.0, 1.0, 10, 1, ValueError),    # Only 1 grid point in y-direction
+    (1.0, 1.0, 0, 10, ValueError),    # 0 grid points in x-direction
+    (1.0, 1.0, 10, 0, ValueError),    # 0 grid points in y-direction
+    (1.0, 1.0, -1, 10, ValueError),   # Negative grid points in x-direction
+    (1.0, 1.0, 10, -1, ValueError),   # Negative grid points in y-direction
+])
+def test_grid_invalid_number_of_grid_points(lx, ly, nx, ny, expected_exception):
     """
     Validate that the number of grid points is valid.
     """
 
-    # Test with float grid points in x-direction
-    with pytest.raises(TypeError):
-        Grid(lx=1.0, ly=1.0, nx=1.0, ny=10)
-
-    # Test with float grid points in y-direction
-    with pytest.raises(TypeError):
-        Grid(lx=1.0, ly=1.0, nx=10, ny=1.0)
-
-    # Test with only 1 grid point in x-direction
-    with pytest.raises(ValueError):
-        Grid(lx=1.0, ly=1.0, nx=1, ny=10)
-
-    # Test with only 1 grid point in y-direction
-    with pytest.raises(ValueError):
-        Grid(lx=1.0, ly=1.0, nx=10, ny=1)
-
-    # Test with 0 grid points in x-direction
-    with pytest.raises(ValueError):
-        Grid(lx=1.0, ly=1.0, nx=0, ny=10)
-
-    # Test with 0 grid points in y-direction
-    with pytest.raises(ValueError):
-        Grid(lx=1.0, ly=1.0, nx=10, ny=0)
-
-    # Test with negative grid points in x-direction
-    with pytest.raises(ValueError):
-        Grid(lx=1.0, ly=1.0, nx=-1, ny=10)
-
-    # Test with negative grid points in y-direction
-    with pytest.raises(ValueError):
-        Grid(lx=1.0, ly=1.0, nx=10, ny=-1)
+    with pytest.raises(expected_exception):
+        Grid(lx=lx, ly=ly, nx=nx, ny=ny)
 
 def test_grid_discretization():
     """
@@ -88,7 +63,7 @@ def test_grid_discretization():
     assert math.isclose(grid.dx, 1.0 / 127.0, rel_tol=TOLERANCE)
     assert math.isclose(grid.dy, 1.0 / 127.0, rel_tol=TOLERANCE)
 
-def test_grid_discretization_asymmetric_lenght():
+def test_grid_discretization_asymmetric_length():
     """
     Test if spatial discretization is correct with different grid lengths.
     """
