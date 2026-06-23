@@ -1,4 +1,5 @@
 import numpy as np
+from .finite_differences import backward_diff_x
 
 def build_up_b(dx : float,
                dy : float,
@@ -148,7 +149,7 @@ def update_velocity(u : np.ndarray,
     # u component
     u[1:-1, 1:-1] = (un[1:-1, 1:-1]-
                          un[1:-1, 1:-1] * dt / dx *
-                        (un[1:-1, 1:-1] - un[1:-1, 0:-2]) -
+                         backward_diff_x(un, dx) -
                          vn[1:-1, 1:-1] * dt / dy *
                         (un[1:-1, 1:-1] - un[0:-2, 1:-1]) -
                          dt / (2 * rho * dx) * (p[1:-1, 2:] - p[1:-1, 0:-2]) +
