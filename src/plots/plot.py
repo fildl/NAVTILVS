@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-from ns_solver.grid import Grid
+from ns_solver import Grid
 
 def plot_stream(u : np.ndarray,
                 v : np.ndarray,
