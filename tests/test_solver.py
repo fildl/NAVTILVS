@@ -103,6 +103,7 @@ def test_build_up_b_cross_shear():
 
     For rho = 1.0, we expect b = -2.0 on inner nodes.
     """
+    
     nx, ny = 10, 10
     dx, dy = 0.1, 0.1
     
@@ -139,9 +140,62 @@ def test_pressure_poisson_flat():
     def identity_bc(x):
         return x
         
-    p_new = pressure_poisson(p, dx=0.1, dy=0.1, b=b, boundary_conditions=identity_bc, max_iter=10)
+    p = pressure_poisson(p, dx=0.1, dy=0.1, b=b, boundary_conditions=identity_bc, max_iter=10)
     
-    assert np.allclose(p_new, 3.0, rtol=TOLERANCE)
+    assert np.allclose(p, 3.0, rtol=TOLERANCE)
+
+def test_pressure_poisson_linear():
+    """
+    Verify that if the source term :math:`b = 0` and boundary conditions match a linear
+    pressure field (p = x + y), pressure field remains constant.
+    """
+
+    nx, ny = 10, 10
+    dx, dy = 0.1, 0.1
+    
+    # Grid coordinates
+    x = np.arange(nx) * dx
+    y = np.arange(ny) * dy
+    X, Y = np.meshgrid(x, y)
+    
+    # Linear field p = x + y
+    p = X + Y
+
+    b = np.zeros((ny, nx))
+    
+    def identity_bc(x):
+        return x
+        
+    p = pressure_poisson(p, dx=dx, dy=dy, b=b, boundary_conditions=identity_bc, max_iter=10)
+    
+    assert np.allclose(p, X + Y, rtol=TOLERANCE)
+
+def test_pressure_poisson_quadratic():
+    """
+    Verify that for a quadratic pressure field (p = x^2 + y^2) and constant source
+    term (b = 4.0), pressure field remains constant.
+    """
+
+    nx, ny = 10, 10
+    dx, dy = 0.1, 0.1
+    
+    # Grid coordinates
+    x = np.arange(nx) * dx
+    y = np.arange(ny) * dy
+    X, Y = np.meshgrid(x, y)
+    
+    # Quadratic field p = x^2 + y^2
+    p = X**2 + Y**2
+
+    # Laplacian: d2p/dx2 + d2p/dy2 = 2.0 + 2.0 = 4.0
+    b = np.ones((ny, nx)) * 4.0
+    
+    def identity_bc(x):
+        return x
+        
+    p = pressure_poisson(p, dx=dx, dy=dy, b=b, boundary_conditions=identity_bc, max_iter=10)
+    
+    assert np.allclose(p, X**2 + Y**2, rtol=TOLERANCE)
 
 def test_update_velocity_uniform_flow():
     """
