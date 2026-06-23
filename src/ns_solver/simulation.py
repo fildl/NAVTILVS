@@ -127,7 +127,18 @@ class SimulationClass:
     def step(self,
              dt_override : float = None):
         """
-        Solve NS equations for one time step using dynamic time-stepping.
+        Perform a single time step of the Navier-Stokes solver.
+
+        This function updates the velocity and pressure fields by solving the momentum
+        and pressure Poisson equations.
+        It dynamically calculates the time step :math:`dt`.
+        If the time step exceeds the target end time, it is cut to match the target time.
+
+        Parameters
+        ----------
+        dt_override : float, optional
+            Time step used instead of the dynamically computed one,
+            for matching simulation end-time.
         """
 
         if dt_override is None:
@@ -174,17 +185,28 @@ class SimulationClass:
               nt : int = None
               ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
-        Solve the NS equations for :math:`nt` time steps.
+        Solve the Navier-Stokes equations.
+
+        This function runs the simulation for a target simulated time t_end
+        or for a specific number of time steps nt.
+        The time step size is dynamically adapted during the simulation.
 
         Parameters
         ----------
-        nt : int
+        t_end : float, optional
+            Target time to reach (in seconds).
+        nt : int, optional
             Number of time steps to simulate.
 
         Returns
         -------
         tuple[np.ndarray, np.ndarray, np.ndarray]
-            Final fields for u, v, and p.
+            A tuple containing the final fields (u, v, p).
+
+        Raises
+        ------
+        ValueError
+            If neither or both parameters are specified.
         """
 
         if t_end is None and nt is None:
