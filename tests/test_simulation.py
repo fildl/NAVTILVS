@@ -3,6 +3,7 @@ import math
 import numpy as np
 from ns_solver import Grid
 from ns_solver import SimulationClass, CavitySimulation
+
 TOLERANCE = 5e-5
 
 def test_simulation_invalid_inputs():
@@ -246,3 +247,35 @@ def test_simulation_solve_zero_steps():
     assert np.all(u == 0.0)
     assert np.all(v == 0.0)
     assert np.all(p == 0.0)
+
+def test_simulation_solve_target_time():
+    """
+    Verify that solving to a target time stops exactly at t_end.
+    """
+
+    grid = Grid(lx=1.0, ly=1.0, nx=10, ny=10)
+    sim = SimulationClass(grid=grid, rho=1.0, nu=0.1, dt=0.001)
+    
+    # Run simulation to t_end = 0.005 seconds
+    t_target = 0.005
+    u, v, p = sim.solve(t_end=t_target)
+    
+    # Check that the simulated time is exactly t_target
+    assert math.isclose(sim.t, t_target, abs_tol=TOLERANCE)
+
+def test_simulation_solve_invalid_args():
+    """
+    Verify that calling solve with invalid combinations of t_end and nt raises ValueError.
+    """
+    
+    grid = Grid(lx=1.0, ly=1.0, nx=10, ny=10)
+    sim = SimulationClass(grid=grid, rho=1.0, nu=0.1, dt=0.001)
+    
+    # Neither t_end nor nt specified
+    with pytest.raises(ValueError):
+        sim.solve()
+        
+    # Both t_end and nt specified
+    with pytest.raises(ValueError):
+        sim.solve(t_end=0.005, nt=10)
+
