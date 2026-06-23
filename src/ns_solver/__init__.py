@@ -2,6 +2,7 @@
 from .grid import Grid
 from .simulation import SimulationClass, CavitySimulation
 from .solver import build_up_b, pressure_poisson, update_velocity
+from .finite_differences import backward_diff_x
 
 __all__ = [
     "Grid",
@@ -10,4 +11,5 @@ __all__ = [
     "build_up_b",
     "pressure_poisson",
     "update_velocity",
+    "backward_diff_x",
 ]
