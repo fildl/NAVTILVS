@@ -41,6 +41,9 @@ class SimulationClass:
         # Store the input time step for compute dynamic time stepping
         self.dt_max = self.dt
 
+        # Initialize simulation time
+        self.t = 0.0 
+
         # Initialize velocity and pressure fields
         self.u = np.zeros((self.grid.ny, self.grid.nx))
         self.v = np.zeros((self.grid.ny, self.grid.nx))
@@ -121,13 +124,16 @@ class SimulationClass:
         """
         return u, v
 
-    def step(self):
+    def step(self,
+             dt_override : float = None):
         """
         Solve NS equations for one time step using dynamic time-stepping.
         """
 
-        # Compute dynamic time step
-        self.dt = self.compute_dynamic_dt()
+        if dt_override is None:
+            self.dt = self.compute_dynamic_dt()
+        else:
+            self.dt = dt_override
 
         dx = self.grid.dx
         dy = self.grid.dy
@@ -159,9 +165,13 @@ class SimulationClass:
         
         # Boundary conditions for velocity fileds
         self.u, self.v = self.velocity_bc(self.u, self.v)
+
+        # Update simulation time
+        self.t += self.dt
         
     def solve(self,
-              nt : int
+              t_end : float = None,
+              nt : int = None
               ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Solve the NS equations for :math:`nt` time steps.
@@ -177,8 +187,24 @@ class SimulationClass:
             Final fields for u, v, and p.
         """
 
-        for _ in range(nt):
-            self.step()
+        if t_end is None and nt is None:
+            raise ValueError("You must specify at least one of 't_end' or 'nt'.")
+        if t_end is not None and nt is not None:
+            raise ValueError("You cannot specify both 't_end' and 'nt'.")
+        
+        if nt is not None:
+            for _ in range(nt):
+                self.step()
+        else:
+            # Simulate until reaching t_end
+            while self.t < t_end:
+                dt = self.compute_dynamic_dt()
+                
+                # If the next time step exceeds the target time, cut it
+                if self.t + dt > t_end:
+                    dt = t_end - self.t
+                
+                self.step(dt_override=dt)
 
         return self.u, self.v, self.p
     
