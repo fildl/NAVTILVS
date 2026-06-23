@@ -1,5 +1,3 @@
-import pytest
-import math
 import numpy as np
 from ns_solver import build_up_b, pressure_poisson, update_velocity
 
