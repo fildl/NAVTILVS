@@ -6,6 +6,7 @@ Code Documentation (API)
    :caption: Modules:
 
    api/grid
+   api/finite_differences
    api/solver
    api/simulation
    api/plots
