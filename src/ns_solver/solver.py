@@ -1,5 +1,5 @@
 import numpy as np
-from .finite_differences import backward_diff_x, backward_diff_y
+from .finite_differences import backward_diff_x, backward_diff_y, centered_diff_x, centered_diff_y
 
 def build_up_b(dx : float,
                dy : float,
@@ -36,13 +36,16 @@ def build_up_b(dx : float,
     
     b = np.zeros_like(u)
 
-    b[1:-1, 1:-1] = (rho * (1 / dt * 
-                    ((u[1:-1, 2:] - u[1:-1, 0:-2]) / (2 * dx) + 
-                     (v[2:, 1:-1] - v[0:-2, 1:-1]) / (2 * dy)) -
-                    ((u[1:-1, 2:] - u[1:-1, 0:-2]) / (2 * dx))**2 -
-                      2 * ((u[2:, 1:-1] - u[0:-2, 1:-1]) / (2 * dy) *
-                           (v[1:-1, 2:] - v[1:-1, 0:-2]) / (2 * dx)) -
-                    ((v[2:, 1:-1] - v[0:-2, 1:-1]) / (2 * dy))**2))
+    du_dx = centered_diff_x(u, dx)
+    dv_dy = centered_diff_y(v, dy)
+    du_dy = centered_diff_y(u, dy)
+    dv_dx = centered_diff_x(v, dx)
+
+    b[1:-1, 1:-1] = (rho *
+                     (1 / dt * (du_dx + dv_dy) -
+                      du_dx**2 -
+                      2 * (du_dy * dv_dx) - 
+                      dv_dy**2))
 
     return b
 
@@ -151,7 +154,7 @@ def update_velocity(u : np.ndarray,
     u[1:-1, 1:-1] = (un[1:-1, 1:-1]-
                      un[1:-1, 1:-1] * dt * backward_diff_x(un, dx) -
                      vn[1:-1, 1:-1] * dt * backward_diff_y(un, dy) -
-                     dt / (2 * rho * dx) * (p[1:-1, 2:] - p[1:-1, 0:-2]) +
+                     dt / rho * centered_diff_x(p, dx) +
                      nu * (dt / dx**2 *
                            (un[1:-1, 2:] - 2 * un[1:-1, 1:-1] + un[1:-1, 0:-2]) +
                            dt / dy**2 *
@@ -161,7 +164,7 @@ def update_velocity(u : np.ndarray,
     v[1:-1,1:-1] = (vn[1:-1, 1:-1] -
                     un[1:-1, 1:-1] * dt * backward_diff_x(vn, dx) -
                     vn[1:-1, 1:-1] * dt * backward_diff_y(vn, dy) -
-                    dt / (2 * rho * dy) * (p[2:, 1:-1] - p[0:-2, 1:-1]) +
+                    dt / rho * centered_diff_y(p, dy) +
                     nu * (dt / dx**2 *
                           (vn[1:-1, 2:] - 2 * vn[1:-1, 1:-1] + vn[1:-1, 0:-2]) +
                           dt / dy**2 *
