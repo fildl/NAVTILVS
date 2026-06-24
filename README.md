@@ -1,5 +1,7 @@
 # NAVTILVS
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/920a5245c9a348c1aa5f5b6f8503159e)](https://app.codacy.com/gh/fildl/NAVTILVS?utm_source=github.com&utm_medium=referral&utm_content=fildl/NAVTILVS&utm_campaign=Badge_Grade)
+
 NAVTILVS (**NAV**ier-Stokes **T**wo-dimensional **I**ncompressib**L**e **V**isual **S**olver) is a 2D incompressible Navier–Stokes solver written in Python.
 
 ## Documentation
