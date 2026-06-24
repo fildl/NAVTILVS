@@ -1,3 +1,11 @@
+<div align="center">
+
+|Author|Documentation|Code Quality|
+|:----:|:-----------:|:----------:|
+|Filippo Di Ludovico |[![Documentation Status](https://readthedocs.org/projects/navier-stokes-solver/badge/?version=latest)](https://navier-stokes-solver.readthedocs.io/en/latest/?badge=latest)| [![Codacy Badge](https://app.codacy.com/project/badge/Grade/c186675c861548b39c1c3ede696e2ae4)](https://app.codacy.com/gh/fildl/NAVTILVS/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)|
+
+</div>
+
 # NAVTILVS
 
 NAVTILVS (**NAV**ier-Stokes **T**wo-dimensional **I**ncompressib**L**e **V**isual **S**olver) is a 2D incompressible Navier–Stokes solver written in Python.
