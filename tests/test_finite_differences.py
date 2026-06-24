@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from ns_solver import backward_diff_x, backward_diff_y, centered_diff_x, centered_diff_y
+from ns_solver import backward_diff_x, backward_diff_y, centered_diff_x, centered_diff_y, laplacian_2d
 
 TOLERANCE = 1e-5
 
@@ -286,4 +286,74 @@ def test_centered_diff_y_quadratic_array():
         [12.0, 12.0, 12.0]
         ])
 
-    assert np.allclose(centered_diff_y(f, 1.0), expected_result, rtol=TOLERANCE) 
+    assert np.allclose(centered_diff_y(f, 1.0), expected_result, rtol=TOLERANCE)
+
+def test_laplacian_2d_invalid_dimensions():
+    """
+    Test that the 2d Laplacian function raises a ValueError for non-2D arrays.
+    """
+
+    # 1D array
+    f_1d = np.zeros(5)
+    with pytest.raises(ValueError):
+        laplacian_2d(f_1d, 1.0, 1.0)
+
+    # 3D array
+    f_3d = np.zeros((5, 5, 5))
+    with pytest.raises(ValueError):
+        laplacian_2d(f_3d, 1.0, 1.0)
+
+def test_laplacian_2d_zero_array():
+    """
+    Test that the Laplacian of a zero array returns a zero array.
+    """
+
+    f = np.zeros((5, 5))
+
+    assert np.all(laplacian_2d(f, 1.0, 1.0) == 0)
+
+def test_laplacian_2d_uniform_array():
+    """
+    Test that the Laplacian of a uniform array returns a zero array.
+    """
+
+    f = np.ones((5, 5))
+
+    assert np.all(laplacian_2d(f, 1.0, 1.0) == 0.0)
+
+def test_laplacian_2d_linear_array():
+    """
+    Test that the Laplacian of a linear array is zero.
+    """
+
+    # Linear array
+    f = np.array([
+        [1.0,  2.0,  3.0,  4.0, 5.0],
+        [1.0,  2.0,  3.0,  4.0, 5.0],
+        [1.0,  2.0,  3.0,  4.0, 5.0],
+        [1.0,  2.0,  3.0,  4.0, 5.0],
+        [1.0,  2.0,  3.0,  4.0, 5.0],
+        ])
+
+    expected_result = np.zeros((3, 3))
+
+    assert np.all(laplacian_2d(f, 1.0, 1.0) == expected_result)
+
+def test_laplacian_2d_quadratic_array():
+    """
+    Test that the Laplacian of a quadratic array returns the correct values.
+    """
+
+    # Quadratic array in x-direction: f(x) = x^2
+    # The second derivative should be 2.0 everywhere.
+    f = np.array([
+        [0.0,  1.0,  4.0,  9.0, 16.0],
+        [0.0,  1.0,  4.0,  9.0, 16.0],
+        [0.0,  1.0,  4.0,  9.0, 16.0],
+        [0.0,  1.0,  4.0,  9.0, 16.0],
+        [0.0,  1.0,  4.0,  9.0, 16.0],
+        ])
+    
+    expected_result = np.ones((3, 3)) * 2.0
+
+    assert np.allclose(laplacian_2d(f, 1.0, 1.0), expected_result, rtol=TOLERANCE)
