@@ -1,5 +1,5 @@
 import numpy as np
-from .finite_differences import backward_diff_x
+from .finite_differences import backward_diff_x, backward_diff_y
 
 def build_up_b(dx : float,
                dy : float,
@@ -33,6 +33,7 @@ def build_up_b(dx : float,
     np.ndarray
         2D array for the source term b.
     """
+    
     b = np.zeros_like(u)
 
     b[1:-1, 1:-1] = (rho * (1 / dt * 
@@ -148,26 +149,22 @@ def update_velocity(u : np.ndarray,
 
     # u component
     u[1:-1, 1:-1] = (un[1:-1, 1:-1]-
-                         un[1:-1, 1:-1] * dt / dx *
-                         backward_diff_x(un, dx) -
-                         vn[1:-1, 1:-1] * dt / dy *
-                        (un[1:-1, 1:-1] - un[0:-2, 1:-1]) -
-                         dt / (2 * rho * dx) * (p[1:-1, 2:] - p[1:-1, 0:-2]) +
-                         nu * (dt / dx**2 *
-                        (un[1:-1, 2:] - 2 * un[1:-1, 1:-1] + un[1:-1, 0:-2]) +
-                         dt / dy**2 *
-                        (un[2:, 1:-1] - 2 * un[1:-1, 1:-1] + un[0:-2, 1:-1])))
+                     un[1:-1, 1:-1] * dt * backward_diff_x(un, dx) -
+                     vn[1:-1, 1:-1] * dt * backward_diff_y(un, dy) -
+                     dt / (2 * rho * dx) * (p[1:-1, 2:] - p[1:-1, 0:-2]) +
+                     nu * (dt / dx**2 *
+                           (un[1:-1, 2:] - 2 * un[1:-1, 1:-1] + un[1:-1, 0:-2]) +
+                           dt / dy**2 *
+                           (un[2:, 1:-1] - 2 * un[1:-1, 1:-1] + un[0:-2, 1:-1])))
 
     # v component
     v[1:-1,1:-1] = (vn[1:-1, 1:-1] -
-                        un[1:-1, 1:-1] * dt / dx *
-                       (vn[1:-1, 1:-1] - vn[1:-1, 0:-2]) -
-                        vn[1:-1, 1:-1] * dt / dy *
-                       (vn[1:-1, 1:-1] - vn[0:-2, 1:-1]) -
-                        dt / (2 * rho * dy) * (p[2:, 1:-1] - p[0:-2, 1:-1]) +
-                        nu * (dt / dx**2 *
-                       (vn[1:-1, 2:] - 2 * vn[1:-1, 1:-1] + vn[1:-1, 0:-2]) +
-                        dt / dy**2 *
-                       (vn[2:, 1:-1] - 2 * vn[1:-1, 1:-1] + vn[0:-2, 1:-1])))
+                    un[1:-1, 1:-1] * dt * backward_diff_x(vn, dx) -
+                    vn[1:-1, 1:-1] * dt * backward_diff_y(vn, dy) -
+                    dt / (2 * rho * dy) * (p[2:, 1:-1] - p[0:-2, 1:-1]) +
+                    nu * (dt / dx**2 *
+                          (vn[1:-1, 2:] - 2 * vn[1:-1, 1:-1] + vn[1:-1, 0:-2]) +
+                          dt / dy**2 *
+                          (vn[2:, 1:-1] - 2 * vn[1:-1, 1:-1] + vn[0:-2, 1:-1])))
 
     return u, v
