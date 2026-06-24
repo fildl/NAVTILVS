@@ -8,9 +8,9 @@ NU = 0.1  # Kinematic viscosity
 
 # Define grid
 grid = Grid(lx = 1.0,
-             ly = 1.0,
-             nx = 64,
-             ny = 64)
+            ly = 1.0,
+            nx = 64,
+            ny = 64)
 
 # Define simulation
 simulation = CavitySimulation(grid=grid,
