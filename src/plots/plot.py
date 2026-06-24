@@ -50,7 +50,7 @@ def plot_stream(u : np.ndarray,
     
     plt.xlabel('X')
     plt.ylabel('Y')
-    plt.title(f"Final State\nRho: {rho} Nu: {nu}")
+    plt.title(f"Final State\n$\\rho = {rho}$, $\\nu = {nu}$")
 
     # Show plot
     plt.show()
