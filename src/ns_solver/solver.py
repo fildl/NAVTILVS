@@ -1,5 +1,5 @@
 import numpy as np
-from .finite_differences import backward_diff_x, backward_diff_y, centered_diff_x, centered_diff_y
+from .finite_differences import backward_diff_x, backward_diff_y, centered_diff_x, centered_diff_y, laplacian_2d
 
 def build_up_b(dx : float,
                dy : float,
@@ -155,19 +155,13 @@ def update_velocity(u : np.ndarray,
                      un[1:-1, 1:-1] * dt * backward_diff_x(un, dx) -
                      vn[1:-1, 1:-1] * dt * backward_diff_y(un, dy) -
                      dt / rho * centered_diff_x(p, dx) +
-                     nu * (dt / dx**2 *
-                           (un[1:-1, 2:] - 2 * un[1:-1, 1:-1] + un[1:-1, 0:-2]) +
-                           dt / dy**2 *
-                           (un[2:, 1:-1] - 2 * un[1:-1, 1:-1] + un[0:-2, 1:-1])))
+                     nu * dt * laplacian_2d(un, dx, dy))
 
     # v component
     v[1:-1,1:-1] = (vn[1:-1, 1:-1] -
                     un[1:-1, 1:-1] * dt * backward_diff_x(vn, dx) -
                     vn[1:-1, 1:-1] * dt * backward_diff_y(vn, dy) -
                     dt / rho * centered_diff_y(p, dy) +
-                    nu * (dt / dx**2 *
-                          (vn[1:-1, 2:] - 2 * vn[1:-1, 1:-1] + vn[1:-1, 0:-2]) +
-                          dt / dy**2 *
-                          (vn[2:, 1:-1] - 2 * vn[1:-1, 1:-1] + vn[0:-2, 1:-1])))
+                    nu * dt * laplacian_2d(vn, dx, dy))
 
     return u, v
