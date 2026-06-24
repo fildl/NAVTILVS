@@ -219,7 +219,8 @@ class SimulationClass:
                 self.step()
         else:
             # Simulate until reaching t_end
-            while self.t < t_end:
+            # We include a 1e-8 tolerance to avoid too small dt
+            while self.t < t_end - 1e-8:
                 dt = self.compute_dynamic_dt()
                 
                 # If the next time step exceeds the target time, cut it
