@@ -279,3 +279,35 @@ def test_simulation_solve_invalid_args():
     with pytest.raises(ValueError):
         sim.solve(t_end=0.005, nt=10)
 
+def test_simulation_solve_dt_not_too_small():
+    """
+    Verify that when self.t is extremely close to t_end,
+    the solver does not take a small time step (dt < 1e-8) that would cause division by a number close to zero.
+    """
+
+    grid = Grid(lx=1.0, ly=1.0, nx=10, ny=10)
+    
+    class SimulationTest(SimulationClass):
+        """
+        A class to store time steps
+        """
+
+        def __post_init__(self):
+            super().__post_init__()
+            # Create a list to store time steps
+            self.dts = []
+
+        def step(self, dt_override=None):
+            super().step(dt_override)
+            self.dts.append(self.dt)
+
+    sim = SimulationTest(grid=grid, rho=1.0, nu=0.1, dt=0.0001)
+    # Set t_end slightly larger than a multiple of dt by 1e-15, since 10 steps of dt=0.0001 reach exactly 0.001.
+    t_target = 0.001 + 1e-15
+
+    sim.solve(t_end=t_target)
+    
+    # Verify that no time step was smaller than the 1e-8 tolerance
+    for dt in sim.dts:
+        assert dt >= 1e-8
+
