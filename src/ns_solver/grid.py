@@ -70,6 +70,11 @@ class Grid:
     def X(self) -> np.ndarray:
         """
         Define grid coordinates along the x-axis.
+
+        Returns
+        -------
+        np.ndarray
+            Grid coordinates along the x-axis.
         """
 
         x = np.linspace(0, self.lx, self.nx)
@@ -81,6 +86,11 @@ class Grid:
     def Y(self) -> np.ndarray:
         """
         Define grid coordinates along the y-axis.
+
+        Returns
+        -------
+        np.ndarray
+            Grid coordinates along the y-axis.
         """
 
         x = np.linspace(0, self.lx, self.nx)
