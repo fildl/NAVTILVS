@@ -1,3 +1,4 @@
+import numpy as np
 from dataclasses import dataclass
 
 @dataclass
@@ -49,6 +50,7 @@ class Grid:
         float
             Grid spacing in the x-direction.
         """
+
         return self.lx / (self.nx - 1)
     
     @property
@@ -61,4 +63,27 @@ class Grid:
         float
             Grid spacing in the y-direction.
         """
+
         return self.ly / (self.ny - 1)
+    
+    @property
+    def X(self) -> np.ndarray:
+        """
+        Define grid coordinates along the x-axis.
+        """
+
+        x = np.linspace(0, self.lx, self.nx)
+        y = np.linspace(0, self.ly, self.ny)
+        X, _ = np.meshgrid(x, y)
+        return X
+    
+    @property
+    def Y(self) -> np.ndarray:
+        """
+        Define grid coordinates along the y-axis.
+        """
+
+        x = np.linspace(0, self.lx, self.nx)
+        y = np.linspace(0, self.ly, self.ny)
+        _, Y = np.meshgrid(x, y)
+        return Y
