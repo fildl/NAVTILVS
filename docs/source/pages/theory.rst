@@ -96,6 +96,34 @@ To guarantee stable execution across all regimes, the active time step is dynami
 .. math::
    \Delta t = \min(\Delta t_{cfl}, \Delta t_{visc})
 
+Obstacle Modeling and Boundary Conditions
+-----------------------------------------
+
+To simulate flow around an obstacle (such as a cylinder) on a Cartesian grid, a boolean mask :math:`M` is defined over the domain:
+
+.. math::
+   M_{i,j} = 
+   \begin{cases} 
+   1 & \text{if node } (i,j) \text{ is inside the obstacle} \\
+   0 & \text{otherwise (fluid)}
+   \end{cases}
+
+Solid boundary conditions are enforced on the obstacle through two mechanisms:
+
+1. **Velocity No-Slip**:
+   The fluid velocity is forced to zero on all masked nodes:
+
+   .. math::
+      u_{i,j} = 0, \quad v_{i,j} = 0 \quad \forall (i,j) \text{ where } M_{i,j} = 1
+
+2. **Pressure Zero Normal Gradient**:
+   The physical boundary condition for pressure on a solid wall is :math:`\frac{\partial p}{\partial n} = 0`. On a staircoded Cartesian grid, this is approximated by setting the pressure of each obstacle node to the pressure of its nearest fluid neighbor:
+
+   .. math::
+      p_{i,j} = p_{\text{nearest fluid}(i,j)} \quad \forall (i,j) \text{ where } M_{i,j} = 1
+
+   This 1-to-1 mapping allows a vectorized update of the pressure field during the Poisson iterations, ensuring computational efficiency and a smooth pressure field inside the solid body for visualization.
+
 
 References
 ----------
