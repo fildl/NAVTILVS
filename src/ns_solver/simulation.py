@@ -274,7 +274,6 @@ class CavitySimulation(SimulationClass):
         It imposes no-slip conditions :math:`u = 0` and :math:`v = 0` on left, right and bottom walls
         and a costant velocity :math:`u = 1` on the top wall.
 
-
         Parameters
         ----------
         u : np.ndarray
@@ -301,4 +300,153 @@ class CavitySimulation(SimulationClass):
         v[:, 0]  = 0
         v[:, -1] = 0
 
+        return u, v
+
+@dataclass
+class CylinderSimulation(SimulationClass):
+    """
+    This class handles the simulation of flow around a cylindrical obstacle inside a channel.
+
+    This class extends the base Navier-Stokes solver to handle a solid circular obstacle within the domain.
+    It implements a channel flow setup with a constant velocity inlet, a constant pressure outlet,
+    no-slip walls (top/bottom), and a no-slip cylinder boundary.
+
+    Parameters
+    ----------
+    cylinder_center : tuple[float, float]
+        Physical coordinates (xc, yc) of the cylinder's center.
+    cylinder_radius : float
+        Physical radius of the cylinder.
+    u_inlet : float, default=1.0
+        Uniform horizontal velocity imposed at the channel inlet.
+    """
+
+    cylinder_center: tuple[float, float]
+    cylinder_radius: float
+    u_inlet: float = 1.0
+
+    def __post_init__(self):
+        r"""
+        Initialize the cylinder simulation by creating the obstacle mask and 
+        pre-computing the nearest fluid nodes for pressure boundary conditions.
+
+        To apply the pressure boundary condition :math:`\\frac{\partial p}{\partial n} = 0`
+        on the surface of the cylinder, each obstacle node is mapped to its closest fluid neighbor.
+        During the pressure Poisson iterations, the pressure on the obstacle cells is updated
+        by copying the value of their nearest fluid neighbors. 
+        
+        If a node is equidistant from multiple fluid cells (e.g., at the center of symmetry),
+        the algorithm selects one of them.
+        This approximation introduces negligible local errors that vanish as the grid resolution increases.
+        """
+
+        # Initialize velocity and pressure fields
+        super().__post_init__()
+
+        # Define a mask for the cylinder obstacle
+        xc, yc = self.cylinder_center
+        r = self.cylinder_radius
+        # We include a 1e-9 tolerance to be sure that boundaries node are included in the mask
+        self.obstacle_mask = (self.grid.X - xc)**2 + (self.grid.Y - yc)**2 <= r**2 + 1e-9
+
+        # Define coordinates for obstacle and fluid
+        self.obs_y, self.obs_x = np.where(self.obstacle_mask)
+        self.fluid_y, self.fluid_x = np.where(~self.obstacle_mask)
+
+        # Convert fluid indexes into spatial coordinates in order to find minimum distance 
+        fluid_coords = np.column_stack((self.fluid_x * self.grid.dx,
+                                        self.fluid_y * self.grid.dy))
+        
+        nearest_fluid_y = []
+        nearest_fluid_x = []
+        
+        # For each obstacle node, compute the distance with fluid nodes to find the closest one
+        for oy, ox in zip(self.obs_y, self.obs_x):
+            op_phys = np.array([ox * self.grid.dx, oy * self.grid.dy])
+            dists = np.sum((fluid_coords - op_phys)**2, axis=1)
+            min_idx = np.argmin(dists)
+            nearest_fluid_y.append(self.fluid_y[min_idx])
+            nearest_fluid_x.append(self.fluid_x[min_idx])
+
+        self.nearest_fluid_y = np.array(nearest_fluid_y)
+        self.nearest_fluid_x = np.array(nearest_fluid_x)
+
+    def pressure_bc(self,
+                    p: np.ndarray) -> np.ndarray:
+        """
+        Apply pressure boundary conditions for channel flow around a cylinder.
+
+        It imposes zero gradient on top, bottom, and left (inlet) walls, 
+        constant reference pressure p = 0 at the right boundary (outlet),
+        and zero normal gradient on the cylinder surface.
+
+        Parameters
+        ----------
+        p : np.ndarray
+            Pressure field matrix.
+
+        Returns
+        -------
+        np.ndarray
+            Pressure field with boundary conditions applied.
+        """
+
+        # Top and bottom walls: zero normal gradient
+        p[0, :] = p[1, :]
+        p[-1, :] = p[-2, :]
+        
+        # Inlet (left): zero normal gradient
+        p[:, 0] = p[:, 1]
+        
+        # Outlet (right): constant pressure
+        p[:, -1] = 0.0
+        
+        # Cylinder obstacle: copy pressure from the pre-computed nearest fluid cells
+        if len(self.obs_y) > 0:
+            p[self.obs_y, self.obs_x] = p[self.nearest_fluid_y, self.nearest_fluid_x]
+            
+        return p
+    
+    def velocity_bc(self,
+                    u: np.ndarray,
+                    v: np.ndarray
+                    ) -> tuple[np.ndarray, np.ndarray]:
+        """
+        Apply velocity boundary conditions for channel flow around a cylinder.
+
+        It imposes no-slip conditions (u = 0, v = 0) on the top/bottom walls 
+        and the cylinder surface, a uniform velocity profile at the inlet,
+        and convective/zero-gradient outlet conditions.
+
+        Parameters
+        ----------
+        u : np.ndarray
+            Velocity field in the x-direction.
+        v : np.ndarray
+            Velocity field in the y-direction.
+
+        Returns
+        -------
+        tuple[np.ndarray, np.ndarray]
+            Tuple containing velocity fields with boundary conditions applied.
+        """
+
+        # Inlet (left): uniform flow
+        u[:, 0] = self.u_inlet
+        v[:, 0] = 0.0
+
+        # Outlet (right): zero gradient (flow continues out of the channel)
+        u[:, -1] = u[:, -2]
+        v[:, -1] = v[:, -2]
+
+        # Top and bottom walls: no-slip
+        u[0, :] = 0.0
+        u[-1, :] = 0.0
+        v[0, :] = 0.0
+        v[-1, :] = 0.0
+        
+        # Cylinder obstacle: no-slip
+        u[self.obstacle_mask] = 0.0
+        v[self.obstacle_mask] = 0.0
+        
         return u, v
