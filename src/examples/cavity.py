@@ -19,12 +19,12 @@ simulation = CavitySimulation(grid=grid,
                               dt=0.001)
 
 # Run simulation
+print("Running solver...")
 u, v, p = simulation.solve(nt=None, t_end=1.0)
+print(f"Simulation completed! Simulated time: {simulation.t:.3f} s")
 
 # Plot
-plot_stream(
-    u=u, v=v, p=p,
-    grid=grid,
-    rho=RHO,
-    nu=NU
-)
+plot_stream(u=u, v=v, p=p,
+            grid=grid,
+            rho=RHO,
+            nu=NU)
