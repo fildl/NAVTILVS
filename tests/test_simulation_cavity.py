@@ -105,3 +105,31 @@ def test_mass_conservation_fine():
     
     # Check that divergence far from the boundaries is close to zero
     assert np.allclose(center_div, 0.0, atol=1e-2)
+
+def test_cavity_reynolds_number():
+    """
+    Test the calculation of the Reynolds number for CavitySimulation.
+    """
+
+    grid = Grid(lx=2.0, ly=1.0, nx=10, ny=10)
+    sim = CavitySimulation(grid=grid, rho=1.0, nu=0.05, dt=0.001)
+
+    # Re = (u_lid * lx) / nu = (1.0 * 2.0) / 0.05 = 40.0
+    expected_re = (1.0 * 2.0) / 0.05
+    assert np.isclose(sim.reynolds_number, expected_re)
+
+def test_cavity_custom_u_lid():
+    """
+    Test that custom u_lid affects both velocity boundary conditions and Reynolds number.
+    """
+
+    grid = Grid(lx=1.0, ly=1.0, nx=10, ny=10)
+    sim = CavitySimulation(grid=grid, rho=1.0, nu=0.02, dt=0.001, u_lid=2.5)
+
+    # Re = (u_lid * lx) / nu = (2.5 * 1.0) / 0.02 = 125.0
+    expected_re = (2.5 * 1.0) / 0.02
+    assert np.isclose(sim.reynolds_number, expected_re)
+
+    # Check that the BC applies the custom lid velocity
+    sim.u, sim.v = sim.velocity_bc(sim.u, sim.v)
+    assert np.all(sim.u[-1, 1:-1] == 2.5)
