@@ -439,3 +439,24 @@ def test_cylinder_simulation_velocity_bc():
     # Cylinder obstacle: no-slip
     assert np.all(u_bc[sim.obstacle_mask] == 0.0)
     assert np.all(v_bc[sim.obstacle_mask] == 0.0)
+
+def test_cylinder_reynolds_number():
+    """
+    Test the Reynolds number computation for CylinderSimulation.
+    """
+
+    grid = Grid(lx=2.0, ly=0.5, nx=40, ny=20)
+    sim = CylinderSimulation(
+        grid=grid,
+        rho=1.0,
+        nu=0.02,
+        dt=0.001,
+        cylinder_center=(0.5, 0.25),
+        cylinder_radius=0.05,
+        u_inlet=1.5
+    )
+
+    # Diameter D = 2 * radius = 2 * 0.05 = 0.1
+    # Re = (u_inlet * D) / nu = (1.5 * 0.1) / 0.02 = 7.5
+    expected_re = (1.5 * 0.1) / 0.02
+    assert np.isclose(sim.reynolds_number, expected_re)
