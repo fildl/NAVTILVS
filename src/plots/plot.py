@@ -82,6 +82,11 @@ def plot_cylinder_flow(u: np.ndarray,
         - 'vorticity': Plots the vorticity field :math:`(\frac{dv}{dx} - \frac{du}{dy})`.
         - 'velocity': Plots the velocity magnitude field (sqrt(u^2 + v^2)).
         - 'pressure': Plots the pressure field.
+
+    Raises
+    ------
+    ValueError
+        If an invalid mode is provided.
     """
 
     X, Y = grid.X, grid.Y
@@ -131,6 +136,9 @@ def plot_cylinder_flow(u: np.ndarray,
         plt.contourf(X, Y, p_masked, levels=100, cmap='coolwarm')
         plt.colorbar(label='Pressure (Pa)')
         plt.title('Pressure Field')
+
+    else:
+        raise ValueError(f"Invalid mode '{mode}'. Expected 'vorticity', 'velocity', or 'pressure'.")
 
     # Fill the obstacle region
     plt.contourf(X, Y, obstacle_mask.astype(float), levels=[0.5, 1.5], colors=['#333333'])
