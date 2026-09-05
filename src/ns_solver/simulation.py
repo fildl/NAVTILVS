@@ -237,6 +237,9 @@ class CavitySimulation(SimulationClass):
     This class handles the simulation of the Lid-Driven Cavity problem.
     """
 
+    # Define the velocity of the moving lid
+    u_lid: float = 1.0
+
     def pressure_bc(self,
                     p : np.ndarray
                     ) -> np.ndarray:
@@ -288,7 +291,7 @@ class CavitySimulation(SimulationClass):
         """
 
         # Moving top lid
-        u[-1, :] = 1
+        u[-1, :] = self.u_lid
         
         # No-slip conditions on other walls
         u[0, :]  = 0
@@ -301,6 +304,15 @@ class CavitySimulation(SimulationClass):
         v[:, -1] = 0
 
         return u, v
+
+    @property
+    def reynolds_number(self) -> float:
+        """
+        Compute the Reynolds number for the Lid-Driven Cavity flow.
+        """
+
+        characteristic_length = self.grid.lx
+        return (self.u_lid * characteristic_length) / self.nu
 
 @dataclass
 class CylinderSimulation(SimulationClass):
@@ -450,3 +462,12 @@ class CylinderSimulation(SimulationClass):
         v[self.obstacle_mask] = 0.0
         
         return u, v
+
+    @property
+    def reynolds_number(self) -> float:
+        """
+        Compute the Reynolds number for the flow around the cylinder.
+        """
+        
+        characteristic_length = 2.0 * self.cylinder_radius
+        return (self.u_inlet * characteristic_length) / self.nu
