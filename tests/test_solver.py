@@ -3,6 +3,10 @@ from ns_solver import build_up_b, pressure_poisson, update_velocity
 
 TOLERANCE = 1e-5
 
+# ==========================================
+# build_up_b Tests
+# ==========================================
+
 def test_build_up_b_zero_velocity():
     """
     Verify that if the velocity fields are zero, the source term b is zero.
@@ -125,6 +129,10 @@ def test_build_up_b_cross_shear():
     # Check inner nodes: expected value is -2.0
     assert np.allclose(b[1:-1, 1:-1], -2.0, rtol=TOLERANCE)
 
+# ==========================================
+# pressure_poisson Tests
+# ==========================================
+
 def test_pressure_poisson_flat():
     """
     Verify that if the source term :math:`b = 0` and pressure is constant at the boundaries,
@@ -195,6 +203,10 @@ def test_pressure_poisson_quadratic():
     
     assert np.allclose(p, X**2 + Y**2, rtol=TOLERANCE)
 
+# ==========================================
+# update_velocity Tests
+# ==========================================
+
 def test_update_velocity_uniform_flow():
     """
     Verify that velocity updater preserves uniform flow fields in the absence of pressure gradients.
@@ -210,3 +222,97 @@ def test_update_velocity_uniform_flow():
     
     assert np.allclose(u[1:-1, 1:-1], 1.0, rtol=TOLERANCE)
     assert np.allclose(v[1:-1, 1:-1], 0.0, rtol=TOLERANCE)
+
+def test_update_velocity_negative_uniform_flow():
+    """
+    Verify that velocity updater preserves negative uniform velocity fields.
+    """
+
+    u = np.full((10, 10), -1.0)
+    v = np.full((10, 10), -0.5)
+    un = u.copy()
+    vn = v.copy()
+    p = np.zeros((10, 10))
+
+    u, v = update_velocity(u, v, un, vn, dt=0.001, dx=0.1, dy=0.1, p=p, rho=1.0, nu=0.01)
+
+    assert np.allclose(u[1:-1, 1:-1], -1.0, rtol=TOLERANCE)
+    assert np.allclose(v[1:-1, 1:-1], -0.5, rtol=TOLERANCE)
+
+def test_update_velocity_upwind_selection_u():
+    """
+    Verify that update_velocity selects backward difference for u > 0 and forward difference for u < 0.
+    """
+
+    vn = np.zeros((3, 3))
+    p = np.zeros((3, 3))
+    dt = 0.01
+
+    # backward_diff_x: (5 - 0) / 1.0 = 5.0
+    # forward_diff_x:  (20 - 5) / 1.0 = 15.0
+    f = np.array([
+        [0.0, 5.0, 20.0],
+        [0.0, 5.0, 20.0],
+        [0.0, 5.0, 20.0]
+    ])
+    
+    # Case 1: u > 0, it should select backward difference (5.0)
+    u = np.ones((3, 3))
+    un = f.copy()
+    
+    u, v = update_velocity(u, vn.copy(), un, vn, dt=dt, dx=1.0, dy=1.0, p=p, rho=1.0, nu=0.0)
+
+    # u = un - dt * 5.0
+    u_expected = un[1, 1] - dt * (un[1, 1] * 5.0)
+    assert np.isclose(u[1, 1], u_expected, rtol=TOLERANCE)
+
+    # Case 2: u < 0, it should select forward difference (15.0)
+    u = np.full((3, 3), -1.0)
+    un = f.copy()
+    un[1, 1] = -1.0 # set the central node to negative (-1.0) to trigger the < 0 case
+
+    # forward_diff_x = (20.0 - (-1.0)) / 1.0 = 21.0
+    u, v = update_velocity(u, vn.copy(), un, vn, dt=dt, dx=1.0, dy=1.0, p=p, rho=1.0, nu=0.0)
+
+    # u = un - dt * (u_mid * forward) = un - dt * (-1.0 * 21.0)
+    u_expected = un[1, 1] - dt * (un[1, 1] * 21.0)
+    assert np.isclose(u[1, 1], u_expected, rtol=TOLERANCE)
+
+def test_update_velocity_upwind_selection_v():
+    """
+    Verify that update_velocity selects backward difference for v > 0 and forward difference for v < 0.
+    """
+
+    un = np.zeros((3, 3))
+    p = np.zeros((3, 3))
+    dt = 0.01
+
+    # backward_diff_y: (5.0 - 0.0) / 1.0 = 5.0
+    # forward_diff_y:  (20.0 - 5.0) / 1.0 = 15.0
+    f = np.array([
+        [0.0,  0.0,  0.0],
+        [5.0,  5.0,  5.0],
+        [20.0, 20.0, 20.0]
+    ])
+
+    # Case 1: v > 0, it should select backward difference (5.0)
+    v = np.ones((3, 3))
+    vn = f.copy()
+
+    u, v_res = update_velocity(un.copy(), v, un, vn, dt=dt, dx=1.0, dy=1.0, p=p, rho=1.0, nu=0.0)
+
+    # v = vn - dt * 5.0
+    v_expected = vn[1, 1] - dt * (vn[1, 1] * 5.0)
+    assert np.isclose(v_res[1, 1], v_expected, rtol=TOLERANCE)
+
+    # Case 2: v < 0, it should select forward difference (15.0)
+    v = np.full((3, 3), -1.0)
+    vn = f.copy()
+    vn[1, 1] = -1.0  # set the central node to negative (-1.0) to trigger the < 0 case
+
+    # forward_diff_y = (20.0 - (-1.0)) / 1.0 = 21.0
+    u, v = update_velocity(un.copy(), v, un, vn, dt=dt, dx=1.0, dy=1.0, p=p, rho=1.0, nu=0.0)
+
+    # v = vn - dt * 21.0
+    v_expected = vn[1, 1] - dt * (vn[1, 1] * 21.0)
+    assert np.isclose(v[1, 1], v_expected, rtol=TOLERANCE)
