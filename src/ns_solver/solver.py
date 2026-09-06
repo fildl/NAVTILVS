@@ -1,5 +1,10 @@
 import numpy as np
-from .finite_differences import backward_diff_x, backward_diff_y, centered_diff_x, centered_diff_y, laplacian_2d
+from .finite_differences import (
+    backward_diff_x, backward_diff_y,
+    forward_diff_x, forward_diff_y,
+    centered_diff_x, centered_diff_y,
+    laplacian_2d
+)
 
 def build_up_b(dx : float,
                dy : float,
@@ -116,9 +121,11 @@ def update_velocity(u : np.ndarray,
                     ) -> tuple[np.ndarray, np.ndarray]:
     """
     Solve momentum equation for both components.
-
-    Discretizes the Navier-Stokes momentum equations using backward differences for convection
-    and central differences for diffusion.
+    
+    Discretizes the Navier-Stokes momentum equations in time.
+    To ensure numerical stability, convective terms are discretized using a first-order Upwind scheme:
+    backward differences where local velocity is positive, forward differences where local velocity is negative.
+    Pressure gradient and diffusion terms are discretized using second-order central differences.
     
     Parameters
     ----------
@@ -150,18 +157,29 @@ def update_velocity(u : np.ndarray,
 
     """
 
-    # u component
-    u[1:-1, 1:-1] = (un[1:-1, 1:-1]-
-                     un[1:-1, 1:-1] * dt * backward_diff_x(un, dx) -
-                     vn[1:-1, 1:-1] * dt * backward_diff_y(un, dy) -
+    # Extract velocity at internal nodes
+    u_mid = un[1:-1, 1:-1]
+    v_mid = vn[1:-1, 1:-1]
+
+    # Upwind derivatives for u
+    du_dx = np.where(u_mid > 0, backward_diff_x(un, dx), forward_diff_x(un, dx))
+    du_dy = np.where(v_mid > 0, backward_diff_y(un, dy), forward_diff_y(un, dy))
+
+    # Upwind derivatives for v
+    dv_dx = np.where(u_mid > 0, backward_diff_x(vn, dx), forward_diff_x(vn, dx))
+    dv_dy = np.where(v_mid > 0, backward_diff_y(vn, dy), forward_diff_y(vn, dy))
+
+    # Update u component
+    u[1:-1, 1:-1] = (u_mid -
+                     u_mid * dt * du_dx -
+                     v_mid * dt * du_dy -
                      dt / rho * centered_diff_x(p, dx) +
                      nu * dt * laplacian_2d(un, dx, dy))
-
-    # v component
-    v[1:-1,1:-1] = (vn[1:-1, 1:-1] -
-                    un[1:-1, 1:-1] * dt * backward_diff_x(vn, dx) -
-                    vn[1:-1, 1:-1] * dt * backward_diff_y(vn, dy) -
-                    dt / rho * centered_diff_y(p, dy) +
-                    nu * dt * laplacian_2d(vn, dx, dy))
+    # Update v component
+    v[1:-1, 1:-1] = (v_mid -
+                     u_mid * dt * dv_dx -
+                     v_mid * dt * dv_dy -
+                     dt / rho * centered_diff_y(p, dy) +
+                     nu * dt * laplacian_2d(vn, dx, dy))
 
     return u, v
