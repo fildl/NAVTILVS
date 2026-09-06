@@ -60,6 +60,64 @@ def backward_diff_y(f: np.ndarray,
     
     return (f[1:-1, 1:-1] - f[0:-2, 1:-1]) / dy
 
+def forward_diff_x(f: np.ndarray,
+                   dx: float
+                   ) -> np.ndarray:
+    """
+    Compute the forward difference of a 2D array along the x-axis.
+
+    Parameters
+    ----------
+    f : np.ndarray
+        2D array for which to compute the forward difference.
+    dx : float
+        Grid spacing in the x-direction.
+
+    Returns
+    -------
+    np.ndarray
+        2D array with forward difference along the x-axis.
+
+    Raises
+    ------
+    ValueError
+        If the input array is not 2-dimensional.
+    """
+
+    if f.ndim != 2:
+        raise ValueError(f"Input array must be 2-dimensional. Got {f.ndim}D instead.")
+    
+    return (f[1:-1, 2:] - f[1:-1, 1:-1]) / dx
+
+def forward_diff_y(f: np.ndarray,
+                   dy: float
+                   ) -> np.ndarray:
+    """
+    Compute the forward difference of a 2D array along the y-axis.
+
+    Parameters
+    ----------
+    f : np.ndarray
+        2D array for which to compute the forward difference.
+    dy : float
+        Grid spacing in the y-direction.
+
+    Returns
+    -------
+    np.ndarray
+        2D array with forward difference along the y-axis.
+
+    Raises
+    ------
+    ValueError
+        If the input array is not 2-dimensional.
+    """
+    
+    if f.ndim != 2:
+        raise ValueError(f"Input array must be 2-dimensional. Got {f.ndim}D instead.")
+    
+    return (f[2:, 1:-1] - f[1:-1, 1:-1]) / dy
+
 def centered_diff_x(f: np.ndarray,
                     dx: float
                     ) -> np.ndarray:
