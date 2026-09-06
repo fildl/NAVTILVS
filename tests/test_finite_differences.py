@@ -1,8 +1,16 @@
 import pytest
 import numpy as np
-from ns_solver import backward_diff_x, backward_diff_y, centered_diff_x, centered_diff_y, laplacian_2d
+from ns_solver import (
+    backward_diff_x, backward_diff_y,
+    forward_diff_x, forward_diff_y,
+    centered_diff_x, centered_diff_y, laplacian_2d
+)
 
 TOLERANCE = 1e-5
+
+# ==========================================
+# Backward Differences Tests (x-direction)
+# ==========================================
 
 def test_backward_diff_x_invalid_dimensions():
     """
@@ -76,6 +84,10 @@ def test_backward_diff_x_non_uniform_array():
 
     assert np.allclose(backward_diff_x(f, 1.0), expected_result)
 
+# ==========================================
+# Backward Differences Tests (y-direction)
+# ==========================================
+
 def test_backward_diff_y_invalid_dimensions():
     """
     Test that the backward difference function raises a ValueError for non-2D arrays.
@@ -148,6 +160,10 @@ def test_backward_diff_y_non_uniform_array():
 
     assert np.allclose(backward_diff_y(f, 1.0), expected_result)
 
+# ==========================================
+# Centered Differences Tests (x-direction)
+# ==========================================
+
 def test_centered_diff_x_invalid_dimensions():
     """
     Test that the centered difference function raises a ValueError for non-2D arrays.
@@ -217,6 +233,10 @@ def test_centered_diff_x_quadratic_array():
         ])
 
     assert np.allclose(centered_diff_x(f, 1.0), expected_result, rtol=TOLERANCE)
+
+# ==========================================
+# Centered Differences Tests (y-direction)
+# ==========================================
 
 def test_centered_diff_y_invalid_dimensions():
     """
@@ -288,6 +308,10 @@ def test_centered_diff_y_quadratic_array():
 
     assert np.allclose(centered_diff_y(f, 1.0), expected_result, rtol=TOLERANCE)
 
+# ==========================================
+# 2d Laplacian Tests
+# ==========================================
+
 def test_laplacian_2d_invalid_dimensions():
     """
     Test that the 2d Laplacian function raises a ValueError for non-2D arrays.
@@ -357,3 +381,155 @@ def test_laplacian_2d_quadratic_array():
     expected_result = np.ones((3, 3)) * 2.0
 
     assert np.allclose(laplacian_2d(f, 1.0, 1.0), expected_result, rtol=TOLERANCE)
+
+# ==========================================
+# Forward Differences Tests (x-direction)
+# ==========================================
+
+def test_forward_diff_x_invalid_dimensions():
+    """
+    Test that the forward difference function raises a ValueError for non-2D arrays.
+    """
+
+    # 1D array
+    f_1d = np.zeros(5)
+    with pytest.raises(ValueError):
+        forward_diff_x(f_1d, 1.0)
+
+    # 3D array
+    f_3d = np.zeros((5, 5, 5))
+    with pytest.raises(ValueError):
+        forward_diff_x(f_3d, 1.0)
+
+def test_forward_diff_x_zero_array():
+    """
+    Test that forward difference of a zero array returns a zero array.
+    """
+
+    f = np.zeros((5, 5))
+
+    assert np.all(forward_diff_x(f, 1.0) == 0)
+
+def test_forward_diff_x_uniform_array():
+    """
+    Test that the forward difference of a uniform array returns a zero array.
+    """
+    
+    f = np.ones((5, 5))
+
+    assert np.all(forward_diff_x(f, 1.0) == 0.0)
+
+def test_forward_diff_x_linear_array():
+    """
+    Test that the forward difference of a linear array f(x) = x returns 1.0 everywhere.
+    """
+
+    # Linear array in x-direction
+    f = np.zeros((5, 5))
+    for i in range(5):
+        f[:, i] = i
+
+    # The forward difference should be 1 everywhere
+    expected_result = np.ones((3, 3))
+
+    assert np.allclose(forward_diff_x(f, 1.0), expected_result)
+
+def test_forward_diff_x_non_uniform_array():
+    """
+    Test that the forward difference function correctly computes differences
+    for a non-uniformly increasing array.
+    """
+
+    # Non-uniform array in x-direction
+    f = np.array([
+        [1.0, 3.0, 6.0, 10.0],
+        [1.0, 3.0, 6.0, 10.0],
+        [1.0, 3.0, 6.0, 10.0],
+        [1.0, 3.0, 6.0, 10.0]
+    ])
+
+    # Inner nodes
+    # col 1 diff: (6.0 - 3.0)  / 1.0 = 3.0
+    # col 2 diff: (10.0 - 6.0) / 1.0 = 4.0
+    expected = np.array([
+        [3.0, 4.0],
+        [3.0, 4.0]
+    ])
+
+    assert np.allclose(forward_diff_x(f, 1.0), expected)
+
+# ==========================================
+# Forward Differences Tests (y-direction)
+# ==========================================
+
+def test_forward_diff_y_invalid_dimensions():
+    """
+    Test that the forward difference function raises a ValueError for non-2D arrays.
+    """
+
+    # 1D array
+    f_1d = np.zeros(5)
+    with pytest.raises(ValueError):
+        forward_diff_y(f_1d, 1.0)
+
+    # 3D array
+    f_3d = np.zeros((5, 5, 5))
+    with pytest.raises(ValueError):
+        forward_diff_y(f_3d, 1.0)
+
+def test_forward_diff_y_zero_array():
+    """
+    Test that the forward difference of a zero array returns a zero array.
+    """
+
+    f = np.zeros((5, 5))
+
+    assert np.all(forward_diff_y(f, 1.0) == 0)
+
+def test_forward_diff_y_uniform_array():
+    """
+    Test that the forward difference of a uniform array returns a zero array.
+    """
+
+    f = np.ones((5, 5))
+
+    assert np.all(forward_diff_y(f, 1.0) == 0.0)
+
+def test_forward_diff_y_linear_array():
+    """
+    Test that the forward difference of a linear array returns the correct constant value.
+    """
+
+    # Linear array in y-direction
+    f = np.zeros((5, 5))
+    for j in range(5):
+        f[j, :] = j
+
+    # The forward difference should be 1 everywhere
+    expected_result = np.ones((3, 3))
+
+    assert np.allclose(forward_diff_y(f, 1.0), expected_result)
+
+def test_forward_diff_y_non_uniform_array():
+    """
+    Test that the forward difference function correctly computes differences
+    for a non-uniformly increasing array.
+    """
+
+    # Non-uniform array in y-direction
+    f = np.array([
+            [1.0,  1.0,  1.0,  1.0],
+            [3.0,  3.0,  3.0,  3.0],
+            [6.0,  6.0,  6.0,  6.0],
+            [10.0, 10.0, 10.0, 10.0]
+            ])
+
+    # Inner nodes
+    # row 1 diff: (6.0 - 3.0)  / 1.0 = 3.0
+    # row 2 diff: (10.0 - 6.0) / 1.0 = 4.0
+    expected_result = np.array([
+            [3.0, 3.0],
+            [4.0, 4.0]
+            ])
+
+    assert np.allclose(forward_diff_y(f, 1.0), expected_result)
