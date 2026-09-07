@@ -8,13 +8,10 @@ Command-Line Interface (CLI).
 __author__ = ['Filippo Di Ludovico']
 __email__ = ['filippo.diludovico@studio.unibo.it']
 
-import sys
 import argparse
 from pathlib import Path
-
 from ns_solver import Grid, CavitySimulation, CylinderSimulation
 from plots import plot_cavity_flow, plot_cylinder_flow
-
 
 def run_cavity(reynolds: float = 100.0,
                nx: int = 128,
@@ -50,7 +47,7 @@ def run_cavity(reynolds: float = 100.0,
     # Generate all four diagnostic plots
     modes = [
         ('velocity', 'cavity_velocity.png'),
-        ('stream', 'cavity_stream.png'),
+        ('stream', 'cavity_flow.png'),
         ('vorticity', 'cavity_vorticity.png'),
         ('pressure', 'cavity_pressure.png'),
     ]
