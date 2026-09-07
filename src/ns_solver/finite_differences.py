@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+__author__ = ['Filippo Di Ludovico']
+__email__ = ['filippo.diludovico@studio.unibo.it']
+
 import numpy as np
 
 def backward_diff_x(f: np.ndarray,

@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+__author__ = ['Filippo Di Ludovico']
+__email__ = ['filippo.diludovico@studio.unibo.it']
+
 import numpy as np
 from .finite_differences import (
     backward_diff_x, backward_diff_y,
