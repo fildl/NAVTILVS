@@ -14,7 +14,6 @@ def backward_diff_x(f: np.ndarray,
 
     Parameters
     ----------
-
     f : np.ndarray
         2D array for which to compute the backward difference.
     dx : float
@@ -23,7 +22,7 @@ def backward_diff_x(f: np.ndarray,
     Returns
     -------
     np.ndarray
-        2D array with backward difference along the x-axis.
+        2D array of backward differences on interior nodes with shape ``(ny - 2, nx - 2)``.
 
     Raises
     ------
@@ -44,7 +43,6 @@ def backward_diff_y(f: np.ndarray,
 
     Parameters
     ----------
-
     f : np.ndarray
         2D array for which to compute the backward difference.
     dy : float
@@ -53,7 +51,7 @@ def backward_diff_y(f: np.ndarray,
     Returns
     -------
     np.ndarray
-        2D array with backward difference along the y-axis.
+        2D array of backward differences on interior nodes with shape ``(ny - 2, nx - 2)``.
 
     Raises
     ------
@@ -82,7 +80,7 @@ def forward_diff_x(f: np.ndarray,
     Returns
     -------
     np.ndarray
-        2D array with forward difference along the x-axis.
+        2D array of forward differences on interior nodes with shape ``(ny - 2, nx - 2)``.
 
     Raises
     ------
@@ -111,7 +109,7 @@ def forward_diff_y(f: np.ndarray,
     Returns
     -------
     np.ndarray
-        2D array with forward difference along the y-axis.
+        2D array of forward differences on interior nodes with shape ``(ny - 2, nx - 2)``.
 
     Raises
     ------
@@ -132,7 +130,6 @@ def centered_diff_x(f: np.ndarray,
 
     Parameters
     ----------
-
     f : np.ndarray
         2D array for which to compute the centered difference.
     dx : float
@@ -141,7 +138,7 @@ def centered_diff_x(f: np.ndarray,
     Returns
     -------
     np.ndarray
-        2D array with centered difference along the x-axis.
+        2D array of centered differences on interior nodes with shape ``(ny - 2, nx - 2)``.
 
     Raises
     ------
@@ -162,7 +159,6 @@ def centered_diff_y(f: np.ndarray,
 
     Parameters
     ----------
-
     f : np.ndarray
         2D array for which to compute the centered difference.
     dy : float
@@ -171,7 +167,7 @@ def centered_diff_y(f: np.ndarray,
     Returns
     -------
     np.ndarray
-        2D array with centered difference along the y-axis.
+        2D array of centered differences on interior nodes with shape ``(ny - 2, nx - 2)``.
 
     Raises
     ------
@@ -193,7 +189,6 @@ def laplacian_2d(f: np.ndarray,
 
     Parameters
     ----------
-
     f : np.ndarray
         2D array for which to compute the Laplacian.
     dx : float
@@ -204,7 +199,7 @@ def laplacian_2d(f: np.ndarray,
     Returns
     -------
     np.ndarray
-        2D array with Laplacian applied.
+        2D array of Laplacians on interior nodes with shape ``(ny - 2, nx - 2)``.
 
     Raises
     ------

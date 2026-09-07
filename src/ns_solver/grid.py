@@ -10,17 +10,17 @@ from dataclasses import dataclass
 @dataclass
 class Grid:
     """
-    This class contains the spatial 2D domian of the simulation.
+    This class represents the spatial 2D domain of the simulation.
 
-    It handles spatial discretization and initialization of velocity and 
-    pressure fields.
+    It handles spatial discretization and coordinate mesh generation
+    for Cartesian grids.
 
     Parameters
     ----------
     lx : float
-        Length of the domain in the x-direction.
+        Length of the physical domain in the x-direction.
     ly : float
-        Length of the domain in the y-direction.
+        Length of the physical domain in the y-direction.
     nx : int
         Number of grid points in the x-direction.
     ny : int
@@ -49,12 +49,12 @@ class Grid:
     @property
     def dx(self) -> float:
         """
-        Define the grid spacing in the x-direction.
+        Compute the grid spacing in the x-direction.
 
         Returns
         -------
         float
-            Grid spacing in the x-direction.
+            Grid spacing :math:`\\Delta x = l_x / (n_x - 1)`.
         """
 
         return self.lx / (self.nx - 1)
@@ -62,12 +62,12 @@ class Grid:
     @property
     def dy(self) -> float:
         """
-        Define the grid spacing in the y-direction.
+        Compute the grid spacing in the y-direction.
 
         Returns
         -------
         float
-            Grid spacing in the y-direction.
+            Grid spacing :math:`\\Delta y = l_y / (n_y - 1)`.
         """
 
         return self.ly / (self.ny - 1)
@@ -75,12 +75,12 @@ class Grid:
     @property
     def X(self) -> np.ndarray:
         """
-        Define grid coordinates along the x-axis.
+        2D meshgrid array of x-coordinates.
 
         Returns
         -------
         np.ndarray
-            Grid coordinates along the x-axis.
+            Coordinate array :math:`X` with shape ``(ny, nx)``.
         """
 
         x = np.linspace(0, self.lx, self.nx)
@@ -91,12 +91,12 @@ class Grid:
     @property
     def Y(self) -> np.ndarray:
         """
-        Define grid coordinates along the y-axis.
+        2D meshgrid array of y-coordinates.
 
         Returns
         -------
         np.ndarray
-            Grid coordinates along the y-axis.
+            Coordinate array :math:`Y` with shape ``(ny, nx)``.
         """
 
         x = np.linspace(0, self.lx, self.nx)
