@@ -98,10 +98,92 @@ Requirements
 Quickstart & Examples
 ---------------------
 
-NAVTILVS comes with two simulations:
+NAVTILVS can be used both through its command-line interface (CLI) and programmatically via its Python API.
+
+Command-Line Interface (CLI)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The script ``main.py`` provides a unified command-line entrypoint to configure, run, and export diagnostic visualizations for both benchmark cases without writing code.
+
+**Command-line Arguments**:
+
+.. list-table::
+   :widths: 20 15 15 50
+   :header-rows: 1
+
+   * - Argument
+     - Type
+     - Default
+     - Description
+   * - ``--sim``
+     - ``str``
+     - ``cavity``
+     - Simulation benchmark to execute: ``cavity`` (Lid-Driven Cavity) or ``cylinder`` (Flow Around a Cylinder).
+   * - ``--re``
+     - ``float``
+     - ``100.0``
+     - Target Reynolds number (:math:`Re`). Determines the kinematic viscosity :math:`\nu`.
+   * - ``--tend``
+     - ``float``
+     - *auto*
+     - Final physical simulation time in seconds (defaults to ``2.5`` for cavity, ``3.5`` for cylinder).
+   * - ``--nx``
+     - ``int``
+     - *auto*
+     - Number of grid cells along the :math:`x`-direction (defaults to ``128`` for cavity, ``256`` for cylinder).
+   * - ``--ny``
+     - ``int``
+     - *auto*
+     - Number of grid cells along the :math:`y`-direction (defaults to ``128`` for cavity, ``64`` for cylinder).
+   * - ``--output-dir``
+     - ``str``
+     - ``imgs``
+     - Directory path where generated diagnostic figures will be stored.
+
+**CLI Usage Examples**:
+
+1. **Lid-Driven Cavity Benchmark**:
+
+   Runs the classic square cavity problem and generates 4 diagnostic plots:
+
+   .. code-block:: bash
+
+      python main.py --sim cavity --re 100.0 --tend 2.5
+
+   Generated files in ``imgs/``:
+
+   * ``cavity_velocity.png``: Velocity magnitude field overlaid with directional velocity vectors.
+   * ``cavity_flow.png``: Velocity streamlines overlaid on the pressure contour field.
+   * ``cavity_vorticity.png``: Vorticity contour field highlighting vortex core structures.
+   * ``cavity_pressure.png``: Full pressure field distribution.
+
+2. **Flow Past a Circular Cylinder**:
+
+   Solves channel flow past an obstacle, resolving wake separation and vortex shedding:
+
+   .. code-block:: bash
+
+      python main.py --sim cylinder --re 100.0 --tend 3.5
+
+   Generated files in ``imgs/``:
+
+   * ``cylinder_vorticity.png``: Vorticity field showing alternating vortex street shedding.
+   * ``cylinder_velocity.png``: Velocity magnitude field with streamlines and recirculation bubbles.
+   * ``cylinder_pressure.png``: Pressure field with stagnation front and wake depression.
+
+3. **Custom Resolution & High Reynolds Number**:
+
+   .. code-block:: bash
+
+      python main.py --sim cylinder --re 150.0 --nx 512 --ny 128 --tend 5.0 --output-dir results/
+
+Python API
+^^^^^^^^^^
+
+For advanced scripting, custom geometries, or pipeline integration, use the Python API directly:
 
 1. Lid-Driven Cavity Flow
-^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Simulates recirculating vortex dynamics in a square cavity induced by a moving top lid:
 
@@ -126,7 +208,7 @@ Or directly from Python:
                     reynolds=sim.reynolds_number, save_path="imgs/cavity_velocity.png")
 
 2. Flow Around a Circular Cylinder
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Simulates channel flow around an immersed cylinder, resolving boundary layer separation, wake recirculation, and vortex shedding:
 

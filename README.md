@@ -88,8 +88,42 @@ python -m pip install -e ".[dev]"
 
 ## Quickstart
 
-TODO
+### 1. Command-Line Interface (CLI)
 
+Run simulations and save plots with `main.py`:
+
+```bash
+# Run Lid-Driven Cavity benchmark (default Re = 100)
+python main.py --sim cavity
+
+# Run Flow Past a Circular Cylinder (Re = 100)
+python main.py --sim cylinder
+
+# Custom parameters (resolution, Reynolds, duration, output directory)
+python main.py --sim cavity --re 200 --nx 256 --ny 256 --tend 5.0 --output-dir imgs
+```
+
+All plots (velocity, streamlines, vorticity, pressure) are automatically exported to the target directory (`imgs/` by default).
+
+### 2. Python API
+
+Simulations can also be imported and configured directly within Python scripts:
+
+```python
+from ns_solver import Grid, CavitySimulation
+from plots import plot_cavity_flow
+
+# Initialize grid and solver
+grid = Grid(lx=1.0, ly=1.0, nx=128, ny=128)
+sim = CavitySimulation(grid=grid, rho=1.0, nu=0.01, dt=0.001)
+
+# Solve Navier-Stokes equations
+u, v, p = sim.solve(t_end=2.5)
+
+# Visualize and save results
+plot_cavity_flow(u, v, p, grid, mode="velocity", t=sim.t,
+                 reynolds=sim.reynolds_number, save_path="imgs/cavity_velocity.png")
+```
 
 ## Testing
 
