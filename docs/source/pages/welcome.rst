@@ -147,7 +147,7 @@ Simulation Gallery
 ------------------
 
 Lid-Driven Cavity Flow (:math:`Re = 100`, :math:`t = 2.50\text{ s}`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. figure:: /_static/cavity_velocity.png
    :align: center
@@ -164,7 +164,7 @@ Lid-Driven Cavity Flow (:math:`Re = 100`, :math:`t = 2.50\text{ s}`)
    **Streamlines & Pressure Field**: Velocity streamlines and pressure contours depicting corner stagnation zones and recirculation.
 
 Flow Past a Circular Cylinder (:math:`Re = 100`, :math:`t = 3.50\text{ s}`)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. figure:: /_static/cylinder_vorticity.png
    :align: center
@@ -201,11 +201,27 @@ Test files are organized into modular suites:
 * ``tests/test_grid.py``: Validates grid spacing, mesh generation, and metric dimensions.
 * ``tests/test_finite_differences.py``: Tests accuracy of centered, backward, forward difference and laplacian operators.
 * ``tests/test_solver.py``: Tests iterative Poisson solver convergence and upwind velocity advection.
+* ``tests/test_simulation_base.py``: Tests base simulation parameters, time integration, and adaptive stability limits (CFL and diffusion).
 * ``tests/test_simulation_cavity.py``: Verifies Dirichlet/Neumann boundary conditions and global mass conservation.
 * ``tests/test_simulation_cylinder.py``: Checks obstacle geometric masking and immersed boundary conditions.
+
+How to Cite
+-----------
+
+If you use **NAVTILVS** in academic coursework, research, or presentations, please cite it as:
+
+.. code-block:: bibtex
+
+   @software{navtilvs_2026,
+     author       = {Filippo Di Ludovico},
+     title        = {NAVTILVS: NAVier-Stokes Two-dimensional IncompressibLe Visual Solver},
+     year         = {2026},
+     publisher    = {GitHub},
+     url          = {https://github.com/fildl/NAVTILVS}
+   }
+
 References
 ----------
 
-The core numerical solver of **NAVTILVS** is based on the educational program `CFDPython: 12 steps to Navier-Stokes <https://github.com/barbagroup/CFDPython>`_ by Prof. Lorena A. Barba's group.
-
-Barba, Lorena A., and Forsyth, Gilbert F. (2018). CFD Python: the 12 steps to Navier-Stokes equations. *Journal of Open Source Education*, 1(9), 21, `https://doi.org/10.21105/jose.00021 <https://doi.org/10.21105/jose.00021>`_.
+1. Barba, L. A., & Forsyth, G. F. (2018). *CFD Python: the 12 steps to Navier-Stokes equations*. Journal of Open Source Education, 1(9), 21. `https://doi.org/10.21105/jose.00021 <https://doi.org/10.21105/jose.00021>`_
+2. Hirsch, C. (2007). *Numerical Computation of Internal and External Flows: The Fundamentals of Computational Fluid Dynamics* (Second Edition). Butterworth-Heinemann.
