@@ -152,10 +152,10 @@ The script ``main.py`` provides a command-line entrypoint to configure, run, and
 
    Generated files in ``imgs/``:
 
-   * ``cavity_velocity.png``: Velocity magnitude field overlaid with velocity vectors.
-   * ``cavity_flow.png``: Velocity streamlines overlaid on the pressure contour field.
-   * ``cavity_vorticity.png``: Vorticity contour field highlighting vortex core structures.
-   * ``cavity_pressure.png``: Full pressure field distribution.
+   * ``cavity_velocity.png``: Velocity magnitude field ('turbo' colormap) overlaid with directional quiver vectors.
+   * ``cavity_flow.png``: Velocity streamlines overlaid on pressure contour field ('turbo' colormap).
+   * ``cavity_vorticity.png``: Vorticity field with symmetric 'coolwarm' colormap highlighting recirculating vortex cores.
+   * ``cavity_pressure.png``: Pressure field distribution with 'coolwarm' colormap.
 
 2. **Flow Past a Circular Cylinder**:
 
@@ -167,9 +167,9 @@ The script ``main.py`` provides a command-line entrypoint to configure, run, and
 
    Generated files in ``imgs/``:
 
-   * ``cylinder_vorticity.png``: Vorticity field showing alternating vortex street shedding.
-   * ``cylinder_velocity.png``: Velocity magnitude field with streamlines and recirculation bubbles.
-   * ``cylinder_pressure.png``: Pressure field with stagnation front and wake depression.
+   * ``cylinder_vorticity.png``: Vorticity field with symmetric 'coolwarm' colormap, resolving alternating Kármán vortex street shedding.
+   * ``cylinder_velocity.png``: Velocity magnitude field ('turbo' colormap) overlaid with streamlines and recirculation bubbles.
+   * ``cylinder_pressure.png``: Pressure field with 'coolwarm' colormap, highlighting upstream stagnation front and low-pressure wake depression.
 
 3. **Custom Resolution & High Reynolds Number**:
 

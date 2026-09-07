@@ -37,8 +37,8 @@ def plot_cavity_flow(u: np.ndarray,
         Spatial grid of the simulation.
     mode : str, default='velocity'
         Visualization mode:
-        - 'velocity': Velocity magnitude field with 'turbo' colormap and white quiver vectors.
-        - 'stream': Pressure contours overlaid with velocity streamlines.
+        - 'velocity': Velocity magnitude field with 'turbo' colormap and directional quiver vectors.
+        - 'stream': Velocity streamlines overlaid on pressure contour field ('turbo' colormap).
         - 'vorticity': Vorticity field with symmetric 'coolwarm' colormap.
         - 'pressure': Pressure field with 'coolwarm' colormap.
     nu : float, optional
@@ -171,10 +171,10 @@ def plot_cylinder_flow(u: np.ndarray,
     obstacle_mask : np.ndarray
         Boolean mask where True represents the cylinder obstacle.
     mode : str, default='vorticity'
-        The field to plot. Options are:
-        - 'vorticity': Plots the vorticity field :math:`(\frac{\partial v}{\partial x} - \frac{\partial u}{\partial y})`.
-        - 'velocity': Plots the velocity magnitude field (sqrt(u^2 + v^2)) with streamlines.
-        - 'pressure': Plots the pressure field.
+        Visualization mode:
+        - 'vorticity': Vorticity field with symmetric 'coolwarm' colormap and masked cylinder obstacle.
+        - 'velocity': Velocity magnitude field with 'turbo' colormap, overlaid with velocity streamlines and masked cylinder obstacle.
+        - 'pressure': Pressure field with 'coolwarm' colormap and masked cylinder obstacle.
     t : float, optional
         Elapsed simulation time in seconds.
     reynolds : float, optional
@@ -182,7 +182,7 @@ def plot_cylinder_flow(u: np.ndarray,
     show_axes : bool, default=True
         Whether to show axis ticks, labels, and title. If False, displays a clean plot frame.
     save_path : str, optional
-        If specified, saves the figure to this path.
+        If specified, saves the figure to this path at 300 DPI.
 
     Raises
     ------
@@ -194,7 +194,7 @@ def plot_cylinder_flow(u: np.ndarray,
 
     mode_titles = {
         'vorticity': 'Vorticity Field',
-        'velocity': 'Velocity Magnitude Field',
+        'velocity': 'Velocity Field',
         'pressure': 'Pressure Field'
     }
     field_name = mode_titles.get(mode, 'Flow Field')

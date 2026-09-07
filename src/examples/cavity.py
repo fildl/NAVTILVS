@@ -23,7 +23,7 @@ print(f"Reynolds number: {simulation.reynolds_number:.2f}")
 u, v, p = simulation.solve(nt=None, t_end=2.5)
 print(f"Simulation completed! Simulated time: {simulation.t:.3f} s")
 
-# 1. Plot velocity field with directional quiver arrows (turbo colormap)
+# 1. Plot Velocity Field
 plot_cavity_flow(u=u, v=v, p=p,
                  grid=grid,
                  mode='velocity',
@@ -31,7 +31,7 @@ plot_cavity_flow(u=u, v=v, p=p,
                  reynolds=simulation.reynolds_number,
                  save_path="imgs/cavity_velocity.png")
 
-# 2. Plot streamlines and pressure contours
+# 2. Plot Streamlines & Pressure Field
 plot_cavity_flow(u=u, v=v, p=p,
                  grid=grid,
                  mode='stream',

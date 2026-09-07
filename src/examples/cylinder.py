@@ -15,7 +15,7 @@ grid = Grid(lx = 2.0,
 simulation = CylinderSimulation(grid=grid,
                                 rho=RHO,
                                 nu=NU,
-                                dt=0.005,
+                                dt=0.002,
                                 cylinder_center=(0.4, 0.225),
                                 cylinder_radius=0.05,
                                 u_inlet=1.0)
@@ -26,7 +26,7 @@ print(f"Reynolds number: {simulation.reynolds_number:.2f}")
 u, v, p = simulation.solve(nt=None, t_end=3.5)
 print(f"Simulation completed! Simulated time: {simulation.t:.3f} s")
 
-# Plot Vorticity
+# 1. Plot Vorticity Field
 plot_cylinder_flow(u=u, v=v, p=p,
                    grid=grid,
                    obstacle_mask=simulation.obstacle_mask,
@@ -35,7 +35,7 @@ plot_cylinder_flow(u=u, v=v, p=p,
                    reynolds=simulation.reynolds_number,
                    save_path='imgs/cylinder_vorticity.png')
 
-# Plot Velocity
+# 2. Plot Velocity Field
 plot_cylinder_flow(u=u, v=v, p=p,
                    grid=grid,
                    obstacle_mask=simulation.obstacle_mask,
@@ -44,7 +44,7 @@ plot_cylinder_flow(u=u, v=v, p=p,
                    reynolds=simulation.reynolds_number,
                    save_path='imgs/cylinder_velocity.png')
 
-# Plot Pressure
+# 3. Plot Pressure Field
 plot_cylinder_flow(u=u, v=v, p=p,
                    grid=grid,
                    obstacle_mask=simulation.obstacle_mask,
