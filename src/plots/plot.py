@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 from pathlib import Path
 from ns_solver import Grid
 from ns_solver import centered_diff_x, centered_diff_y
@@ -10,7 +9,6 @@ def plot_cavity_flow(u: np.ndarray,
                      p: np.ndarray,
                      grid: Grid,
                      mode: str = 'velocity',
-                     rho: float = None,
                      nu: float = None,
                      t: float = None,
                      reynolds: float = None,
@@ -37,8 +35,6 @@ def plot_cavity_flow(u: np.ndarray,
         - 'stream': Pressure contours overlaid with velocity streamlines.
         - 'vorticity': Vorticity field with symmetric 'coolwarm' colormap.
         - 'pressure': Pressure field with 'coolwarm' colormap.
-    rho : float, optional
-        Fluid density.
     nu : float, optional
         Kinematic viscosity.
     t : float, optional
@@ -104,7 +100,8 @@ def plot_cavity_flow(u: np.ndarray,
         limit = max(abs(np.nanmin(vorticity)), abs(np.nanmax(vorticity)))
         if limit == 0.0:
             limit = 1.0
-        cf = plt.contourf(X, Y, vorticity, levels=100, cmap='coolwarm', vmin=-limit, vmax=limit)
+        levels = np.linspace(-limit, limit, 101)
+        cf = plt.contourf(X, Y, vorticity, levels=levels, cmap='coolwarm')
         plt.colorbar(cf, label='Vorticity (rad/s)', fraction=0.046, pad=0.04)
 
     elif mode == 'pressure':
@@ -209,8 +206,9 @@ def plot_cylinder_flow(u: np.ndarray,
         if limit == 0.0:
             limit = 1.0
             
-        plt.contourf(X, Y, vorticity, levels=100, cmap='coolwarm', vmin=-limit, vmax=limit)
-        plt.colorbar(label='Vorticity (rad/s)')
+        levels = np.linspace(-limit, limit, 101)
+        cf = plt.contourf(X, Y, vorticity, levels=levels, cmap='coolwarm')
+        plt.colorbar(cf, label='Vorticity (rad/s)')
         plt.title(f'Vorticity Field{sub_title}')
 
     elif mode == 'velocity':
