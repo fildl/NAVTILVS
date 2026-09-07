@@ -45,7 +45,6 @@ Create and activate a virtual environment (recommended):
 
 .. code-block:: bash
 
-   # Using conda
    conda create -n navtilvs python=3.12
    conda activate navtilvs
 
@@ -69,7 +68,7 @@ Then choose the installation mode:
 
      python -m pip install -e .
 
-  To also install development and testing tools (``pytest``):
+  To also install testing tools (``pytest``):
 
   .. code-block:: bash
 
@@ -83,8 +82,66 @@ Requirements
 * **Core Libraries**:
   * ``numpy >= 1.20.0``
   * ``matplotlib >= 3.4.0``
-* **Development & Testing**:
+* **Testing**:
   * ``pytest >= 7.0.0``
+
+Quickstart & Examples
+---------------------
+
+NAVTILVS comes with two simulations:
+
+1. Lid-Driven Cavity Flow
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Simulates recirculating vortex dynamics in a square cavity induced by a moving top lid:
+
+.. code-block:: bash
+
+   python src/examples/cavity.py
+
+Or directly from Python:
+
+.. code-block:: python
+
+   from ns_solver import Grid, CavitySimulation
+   from plots import plot_cavity_flow
+
+   grid = Grid(lx=1.0, ly=1.0, nx=256, ny=256)
+   sim = CavitySimulation(grid=grid, rho=1.0, nu=0.01, dt=0.001)
+
+   u, v, p = sim.solve(t_end=2.5)
+
+   # Plot velocity magnitude with vectors
+   plot_cavity_flow(u, v, p, grid, mode='velocity', t=sim.t,
+                    reynolds=sim.reynolds_number, save_path="imgs/cavity_velocity.png")
+
+2. Flow Around a Circular Cylinder
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Simulates channel flow around an immersed cylinder, resolving boundary layer separation, wake recirculation, and vortex shedding:
+
+.. code-block:: bash
+
+   python src/examples/cylinder.py
+
+Or from Python:
+
+.. code-block:: python
+
+   from ns_solver import Grid, CylinderSimulation
+   from plots import plot_cylinder_flow
+
+   grid = Grid(lx=2.0, ly=0.5, nx=512, ny=128)
+   sim = CylinderSimulation(grid=grid, rho=1.0, nu=0.001, dt=0.002,
+                            cylinder_center=(0.4, 0.225), cylinder_radius=0.05,
+                            u_inlet=1.0)
+
+   u, v, p = sim.solve(t_end=3.5)
+
+   # Plot vorticity field
+   plot_cylinder_flow(u, v, p, grid, sim.obstacle_mask, mode='vorticity',
+                      t=sim.t, reynolds=sim.reynolds_number,
+                      save_path="imgs/cylinder_vorticity.png")
 
 Simulation Gallery
 ------------------
