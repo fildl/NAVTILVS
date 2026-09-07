@@ -23,7 +23,6 @@
   <p><i>Flow past a circular cylinder (Re = 100): Kármán vortex street resolved with the upwind finite difference scheme.</i></p>
 </div>
 
----
 
 ## Table of Contents
 
@@ -38,7 +37,6 @@
 * [License](#license)
 * [References](#references)
 
----
 
 ## Features
 
@@ -48,7 +46,6 @@
 - **Adaptive Dynamic Time Stepping**: Dynamically adjusts $\Delta t$ at each iteration satisfying both convective CFL and 2D viscous diffusion stability limits.
 - **Visual Analytics**: Dedicated visualization tools generating directional quiver velocity fields, streamlines, pressure contours and vorticity fields.
 
----
 
 ## Installation
 
@@ -88,13 +85,11 @@ python -m pip install .
 python -m pip install -e ".[dev]"
 ```
 
----
 
 ## Quickstart
 
 TODO
 
----
 
 ## Testing
 
@@ -104,13 +99,11 @@ Automated tests validate grid metrics, finite differences, Poisson solver conver
 pytest tests/ -v
 ```
 
----
 
 ## Documentation
 
 The full documentation can be found at [Read the Docs](https://navier-stokes-solver.readthedocs.io/en/latest/).
 
----
 
 ## Contributions
 
@@ -119,8 +112,6 @@ Suggestions, bug reports, and contributions are welcome!
 * **Issues**: Report bugs or suggest features on [GitHub Issues](https://github.com/fildl/NAVTILVS/issues).
 * **Pull Requests**: Submit improvements via [GitHub Pull Requests](https://github.com/fildl/NAVTILVS/pulls).
 * Please ensure all unit tests pass (`pytest tests/ -v`) before submitting contributions.
-
----
 
 
 ## Citation
@@ -137,13 +128,11 @@ If you use NAVTILVS, please cite:
 }
 ```
 
----
 
 ## License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
----
 
 ## References
 
