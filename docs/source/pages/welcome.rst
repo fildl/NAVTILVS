@@ -15,12 +15,56 @@ Features
   * :class:`~ns_solver.simulation.SimulationClass`: Base class for time integration, stability, and solver execution.
   * :class:`~ns_solver.simulation.CavitySimulation`: Implementation of the classic Lid-Driven Cavity benchmark.
   * :class:`~ns_solver.simulation.CylinderSimulation`: Channel flow around a circular obstacle with no-slip and nearest-fluid Neumann boundary conditions.
-* **Visualization**: Plotting tools (:func:`~plots.plot.plot_stream`, :func:`~plots.plot.plot_cylinder_flow`) generating streamlines, velocity magnitude, pressure contours, and symmetric vorticity fields.
+* **Visualization**: Plotting tools (:func:`~plots.plot.plot_cavity_flow`, :func:`~plots.plot.plot_cylinder_flow`) generating velocity vector fields, streamlines, velocity magnitude, pressure contours, and symmetric vorticity fields.
 
 Requirements
 ------------
 
 **TODO**
+
+Simulation Gallery
+------------------
+
+Lid-Driven Cavity Flow
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. figure:: /_static/cavity_velocity.png
+   :align: center
+   :width: 80%
+   :alt: Lid-Driven Cavity Velocity Field
+
+   **Velocity Field** (:math:`Re = 100`, :math:`t = 2.50\text{ s}`): Velocity magnitude overlaid with velocity vectors.
+
+.. figure:: /_static/cavity_flow.png
+   :align: center
+   :width: 80%
+   :alt: Lid-Driven Cavity Streamlines
+
+   **Streamlines & Pressure Field** (:math:`Re = 100`, :math:`t = 2.50\text{ s}`): Primary recirculating vortex and pressure contours.
+
+Flow Around a Circular Cylinder
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. figure:: /_static/cylinder_vorticity.png
+   :align: center
+   :width: 95%
+   :alt: Cylinder Wake Vorticity Field
+
+   **Vorticity Field** (:math:`Re = 100`, :math:`t = 3.50\text{ s}`): Alternating vortex demonstrating wake dynamics.
+
+.. figure:: /_static/cylinder_velocity.png
+   :align: center
+   :width: 95%
+   :alt: Cylinder Velocity Field
+
+   **Velocity Field** (:math:`Re = 100`, :math:`t = 3.50\text{ s}`): Velocity magnitude field with streamlines displaying stagnation and lateral acceleration.
+
+.. figure:: /_static/cylinder_pressure.png
+   :align: center
+   :width: 95%
+   :alt: Cylinder Pressure Field
+
+   **Pressure Field** (:math:`Re = 100`, :math:`t = 3.50\text{ s}`): High-pressure stagnation zone upstream and low-pressure wake zone.
 
 References
 ----------
