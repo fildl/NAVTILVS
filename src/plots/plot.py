@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+from pathlib import Path
 from ns_solver import Grid
 from ns_solver import centered_diff_x, centered_diff_y
 
@@ -69,10 +70,9 @@ def plot_stream(u : np.ndarray,
 
     # Save figure if requested
     if save_path is not None:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-
-    # Show plot
-    plt.show()
+        path = Path(save_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(path, dpi=300, bbox_inches='tight')
 
 def plot_cylinder_flow(u: np.ndarray,
                        v: np.ndarray,
@@ -189,7 +189,8 @@ def plot_cylinder_flow(u: np.ndarray,
     plt.gca().set_aspect('equal')
     plt.tight_layout()
 
+    # Save figure if requested
     if save_path is not None:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-
-    plt.show()
+        path = Path(save_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(path, dpi=300, bbox_inches='tight')
