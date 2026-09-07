@@ -202,7 +202,7 @@ The physical flow regimes past a circular cylinder vary drastically with :math:`
 * (:math:`47 \le Re < 180`):
   The steady wake undergoes a bifurcation; alternating vortices detach periodically.
 * (:math:`Re > 180`):
-  In physical experiments, secondary Tthree-dimensional instabilities emerge, transitioning toward turbulence. Because **NAVTILVS** solves the two-dimensional Navier–Stokes equations, it cannot capture spanwise vortex stretching.
+  In physical experiments, secondary three-dimensional instabilities emerge, transitioning toward turbulence. Because **NAVTILVS** solves the two-dimensional Navier–Stokes equations, it cannot capture spanwise vortex stretching.
 
 .. _obstacle_modeling:
 

@@ -18,7 +18,7 @@ Features
 
   .. math::
 
-     \Delta t \le \min \left( \text{CFL} \cdot \min\left(\frac{\Delta x}{|u|_{\max}}, \frac{\Delta y}{|v|_{\max}}\right), \; \frac{1}{4\nu} \frac{\Delta x^2 \Delta y^2}{\Delta x^2 + \Delta y^2} \right)
+     \Delta t \le \min \left( \frac{C_{\text{cfl}}}{\dfrac{|u|_{\max}}{\Delta x} + \dfrac{|v|_{\max}}{\Delta y}}, \; C_{\text{visc}} \frac{\Delta x^2 \Delta y^2}{2\nu (\Delta x^2 + \Delta y^2)} \right)
 
 * **Modular Object-Oriented Design**:
 
