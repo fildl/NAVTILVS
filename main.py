@@ -20,6 +20,19 @@ def run_cavity(reynolds: float = 100.0,
                output_dir: str = "imgs") -> None:
     """
     Run the Lid-Driven Cavity simulation and generate plots.
+
+    Parameters
+    ----------
+    reynolds : float, default=100.0
+        Target Reynolds number :math:`Re = u_{\\text{lid}} l_x / \\nu`.
+    nx : int, default=128
+        Number of grid points along the x-direction.
+    ny : int, default=128
+        Number of grid points along the y-direction.
+    t_end : float, default=2.5
+        Target physical simulation time in seconds.
+    output_dir : str, default="imgs"
+        Directory where generated diagnostic figures will be saved.
     """
 
     out_path = Path(output_dir)
@@ -68,6 +81,19 @@ def run_cylinder(reynolds: float = 100.0,
                  output_dir: str = "imgs") -> None:
     """
     Run the Flow Past a Cylinder simulation and generate plots.
+
+    Parameters
+    ----------
+    reynolds : float, default=100.0
+        Target Reynolds number :math:`Re = u_{\\text{inlet}} (2 r) / \\nu`.
+    nx : int, default=256
+        Number of grid points along the x-direction.
+    ny : int, default=64
+        Number of grid points along the y-direction.
+    t_end : float, default=3.5
+        Target physical simulation time in seconds.
+    output_dir : str, default="imgs"
+        Directory where generated diagnostic figures will be saved.
     """
 
     out_path = Path(output_dir)
@@ -116,6 +142,15 @@ def run_cylinder(reynolds: float = 100.0,
     print(f"\nAll cylinder plots saved successfully to '{output_dir}/'!")
 
 def parse_args():
+    """
+    Parse command-line interface arguments for NAVTILVS simulations.
+
+    Returns
+    -------
+    argparse.Namespace
+        Parsed command-line arguments.
+    """
+
     parser = argparse.ArgumentParser(
         description="NAVTILVS: 2D Incompressible Navier-Stokes Fluid Flow Solver"
     )
@@ -159,6 +194,10 @@ def parse_args():
     return parser.parse_args()
 
 def main():
+    """
+    CLI entry point: parse arguments and execute the selected fluid simulation.
+    """
+    
     args = parse_args()
 
     if args.sim == "cavity":
