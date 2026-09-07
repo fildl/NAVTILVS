@@ -36,6 +36,7 @@
 * [Authors](#authors)
 * [Citation](#citation)
 * [License](#license)
+* [References](#references)
 
 ---
 
@@ -87,12 +88,64 @@ python -m pip install .
 python -m pip install -e ".[dev]"
 ```
 
+---
+
+## Quickstart
+
+TODO
+
+---
+
+## Testing
+
+Automated tests validate grid metrics, finite differences, Poisson solver convergence, and physical boundary conditions:
+
+```bash
+pytest tests/ -v
+```
+
+---
+
 ## Documentation
 
-The full documentation can be found at [NAVTILVS Documentation](https://navier-stokes-solver.readthedocs.io/en/latest/)
+The full documentation can be found at [Read the Docs](https://navier-stokes-solver.readthedocs.io/en/latest/).
+
+---
+
+## Contributions
+
+Suggestions, bug reports, and contributions are welcome!
+
+* **Issues**: Report bugs or suggest features on [GitHub Issues](https://github.com/fildl/NAVTILVS/issues).
+* **Pull Requests**: Submit improvements via [GitHub Pull Requests](https://github.com/fildl/NAVTILVS/pulls).
+* Please ensure all unit tests pass (`pytest tests/ -v`) before submitting contributions.
+
+---
+
+
+## Citation
+
+If you use NAVTILVS, please cite:
+
+```bibtex
+@software{navtilvs_2026,
+  author       = {Filippo Di Ludovico},
+  title        = {NAVTILVS: NAVier-Stokes Two-dimensional IncompressibLe Visual Solver},
+  year         = {2026},
+  publisher    = {GitHub},
+  url          = {https://github.com/fildl/NAVTILVS}
+}
+```
+
+---
+
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+---
 
 ## References
 
-This project's core solver is based on the educational program [CFDPython: the 12 steps to Navier-Stokes](https://github.com/barbagroup/CFDPython) by Prof. Lorena A. Barba's group. 
-
-* Barba, Lorena A., and Forsyth, Gilbert F. (2018). CFD Python: the 12 steps to Navier-Stokes equations. *Journal of Open Source Education*, 1(9), 21, [https://doi.org/10.21105/jose.00021](https://doi.org/10.21105/jose.00021).
+1. Barba, L. A., & Forsyth, G. F. (2018). *CFD Python: the 12 steps to Navier-Stokes equations*. Journal of Open Source Education, 1(9), 21. [https://doi.org/10.21105/jose.00021](https://doi.org/10.21105/jose.00021)
+2. Hirsch, C. (2007). *Numerical Computation of Internal and External Flows: The Fundamentals of Computational Fluid Dynamics* (Second Edition). Butterworth-Heinemann.
