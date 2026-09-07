@@ -1,21 +1,26 @@
 Welcome to NAVTILVS
 ===================
 
-**NAVTILVS** (**NAV**\ ier-Stokes **T**\ wo-dimensional **I**\ ncompressib\ **L**\ e **V**\ isual **S**\ olver) is a Python library designed to simulate and visualize 2D incompressible fluid flows using finite difference methods.
+**NAVTILVS** (**NAV**\ ier-Stokes **T**\ wo-dimensional **I**\ ncompressib\ **L**\ e **V**\ isual **S**\ olver) is a Python library designed to simulate and visualize 2D incompressible fluid flows using finite difference methods on structured Cartesian grids.
 
 Features
 --------
 
-* **Incompressible Flow Solver**: Solves the 2D unsteady incompressible Navier–Stokes equations using finite difference discretizations on structured Cartesian grids.
+* **Incompressible Flow Solver**: Solves the 2D unsteady incompressible Navier–Stokes equations under the Boussinesq/constant-density approximation.
 * **Vectorized Poisson Pressure Solver**: Pressure is computed via an iterative Poisson solver optimized for NumPy vectorization.
-* **First-Order Upwind Scheme**: Automatically selects forward or backward spatial differences according to local flow direction, eliminating downwind instabilities.
-* **Adaptive Dynamic Time Stepping**: Dynamically evaluates stability constraints at every time step, adhering to both the convective Courant–Friedrichs–Lewy (CFL) condition and the 2D viscous diffusion limit.
+* **First-Order Upwind Scheme**: Automatically selects backward or forward spatial derivatives based on local velocity direction, eliminating unphysical downwind oscillations and preserving numerical stability.
+* **Adaptive Dynamic Time Stepping**: Continuously monitors numerical stability constraints at each iteration, satisfying both the convective Courant–Friedrichs–Lewy (CFL) condition and the 2D viscous diffusion limit:
+
+  .. math::
+
+     \Delta t \le \min \left( \text{CFL} \cdot \min\left(\frac{\Delta x}{|u|_{\max}}, \frac{\Delta y}{|v|_{\max}}\right), \; \frac{1}{4\nu} \frac{\Delta x^2 \Delta y^2}{\Delta x^2 + \Delta y^2} \right)
+
 * **Modular Object-Oriented Design**:
-  * :class:`~ns_solver.grid.Grid`: Handles spatial discretization, metric scale precomputations, and coordinate meshes.
-  * :class:`~ns_solver.simulation.SimulationClass`: Base class for time integration, stability, and solver execution.
-  * :class:`~ns_solver.simulation.CavitySimulation`: Implementation of the classic Lid-Driven Cavity benchmark.
-  * :class:`~ns_solver.simulation.CylinderSimulation`: Channel flow around a circular obstacle with no-slip and nearest-fluid Neumann boundary conditions.
-* **Visualization**: Plotting tools (:func:`~plots.plot.plot_cavity_flow`, :func:`~plots.plot.plot_cylinder_flow`) generating velocity vector fields, streamlines, velocity magnitude, pressure contours, and symmetric vorticity fields.
+  * :class:`~ns_solver.grid.Grid`: Handles spatial domain discretization, metric scales, and mesh coordinates.
+  * :class:`~ns_solver.simulation.SimulationClass`: Base class managing time integration, adaptive time-stepping, and numerical stability.
+  * :class:`~ns_solver.simulation.CavitySimulation`: Solver for the classical Lid-Driven Cavity benchmark problem.
+  * :class:`~ns_solver.simulation.CylinderSimulation`: Channel flow past an immersed circular cylinder with nearest-fluid Neumann pressure and no-slip velocity conditions.
+* **CFD Visual Analytics**: Dedicated visualization tools (:func:`~plots.plot.plot_cavity_flow`, :func:`~plots.plot.plot_cylinder_flow`) generating directional quiver velocity fields, streamlines, pressure contours and vorticity fields.
 
 Requirements
 ------------
