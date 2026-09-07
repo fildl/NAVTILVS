@@ -31,9 +31,9 @@ def build_up_b(dx : float,
     dy : float
         Grid spacing in the y-direction.
     u : np.ndarray
-        Velocity field in the x-direction.
+        Velocity field in the x-direction with shape ``(ny, nx)``.
     v : np.ndarray
-        Velocity field in the y-direction.
+        Velocity field in the y-direction with shape ``(ny, nx)``.
     rho : float
         Fluid density.
     dt : float
@@ -42,7 +42,7 @@ def build_up_b(dx : float,
     Returns
     -------
     np.ndarray
-        2D array for the source term b.
+        2D array for the source term :math:`b` with shape ``(ny, nx)``.
     """
     
     b = np.zeros_like(u)
@@ -68,27 +68,27 @@ def pressure_poisson(p : np.ndarray,
                      max_iter : int = 500
                      ) -> np.ndarray:
     """
-    Solves the Poisson equation for pressure :math:`p`.
+    Solve the Poisson equation for pressure :math:`p`.
 
     Parameters
     ----------
     p : np.ndarray
-        pressure field.
+        Initial pressure field with shape ``(ny, nx)``.
     dx : float
         Grid spacing in the x-direction.
     dy : float
         Grid spacing in the y-direction.
     b : np.ndarray
-        Source term.
+        Source term array with shape ``(ny, nx)``.
     boundary_conditions : callable
-        Function to apply boundary conditions to the pressure field.
-    max_iter : int, optional
-        Maximum number of iterations (default is 500).
+        Function ``bc(p) -> np.ndarray`` applying boundary conditions to the pressure field.
+    max_iter : int, default=500
+        Maximum number of iterations.
 
     Returns
     -------
     np.ndarray
-        2D array for the solved pressure field.
+        2D array for the solved pressure field with shape ``(ny, nx)``.
     """
 
     # Precompute constants for efficiency

@@ -12,18 +12,31 @@ from .solver import build_up_b, pressure_poisson, update_velocity
 @dataclass
 class SimulationClass:
     """
-    This class handles the simulation of the Navier-Stokes equations.
+    Base class managing the time integration of the 2D incompressible Navier-Stokes equations.
     
     Parameters
     ----------
     grid : Grid
         Spatial grid of the simulation.
-    rho: float
+    rho : float
         Fluid density.
     nu : float
         Kinematic viscosity.
     dt : float
-        Time step.
+        Initial time step size.
+
+    Attributes
+    ----------
+    dt_max : float
+        Maximum allowable time step size set from initial dt.
+    t : float
+        Elapsed physical simulation time in seconds.
+    u : np.ndarray
+        Velocity field in the x-direction with shape ``(ny, nx)``.
+    v : np.ndarray
+        Velocity field in the y-direction with shape ``(ny, nx)``.
+    p : np.ndarray
+        Pressure field with shape ``(ny, nx)``.
     """
 
     grid : Grid
@@ -82,7 +95,7 @@ class SimulationClass:
             dt_cfl = 0.5 / (max_u / dx + max_v / dy)
 
         # 2. Viscous Limit (Diffusive limit)
-        # C_visc è il fattore di sicurezza (tipicamente 0.9)
+        # Viscous safety factor (typically 0.9)
         denom_visc = 2.0 * self.nu * (dx**2 + dy**2)
         dt_visc = 0.9 * (dx**2 * dy**2) / denom_visc
 
@@ -180,7 +193,7 @@ class SimulationClass:
                                          self.rho,
                                          self.nu)
         
-        # Boundary conditions for velocity fileds
+        # Boundary conditions for velocity fields
         self.u, self.v = self.velocity_bc(self.u, self.v)
 
         # Update simulation time
@@ -240,7 +253,29 @@ class SimulationClass:
 @dataclass
 class CavitySimulation(SimulationClass):
     """
-    This class handles the simulation of the Lid-Driven Cavity problem.
+    Simulation solver for the classical 2D Lid-Driven Cavity benchmark problem.
+
+    Solves recirculating viscous flow in a closed cavity driven by a
+    moving top lid, with Dirichlet zero-velocity boundaries on walls and
+    Neumann zero-gradient pressure conditions.
+
+    Parameters
+    ----------
+    grid : Grid
+        Spatial grid discretization of the cavity domain.
+    rho : float
+        Fluid density.
+    nu : float
+        Kinematic viscosity.
+    dt : float
+        Initial time step size.
+    u_lid : float, default=1.0
+        Tangential velocity of the moving top lid.
+
+    Attributes
+    ----------
+    reynolds_number : float
+        Reynolds number :math:`Re = u_{\\text{lid}} l_x / \\nu`.
     """
 
     # Define the velocity of the moving lid
@@ -281,7 +316,7 @@ class CavitySimulation(SimulationClass):
         Apply velocity boundary conditions.
 
         It imposes no-slip conditions :math:`u = 0` and :math:`v = 0` on left, right and bottom walls
-        and a costant velocity :math:`u = 1` on the top wall.
+        and a constant velocity :math:`u = u_{\\text{lid}}` on the top wall.
 
         Parameters
         ----------
@@ -315,6 +350,11 @@ class CavitySimulation(SimulationClass):
     def reynolds_number(self) -> float:
         """
         Compute the Reynolds number for the Lid-Driven Cavity flow.
+
+        Returns
+        -------
+        float
+            Reynolds number :math:`Re = u_{\\text{lid}} l_x / \\nu`.
         """
 
         characteristic_length = self.grid.lx
@@ -323,20 +363,34 @@ class CavitySimulation(SimulationClass):
 @dataclass
 class CylinderSimulation(SimulationClass):
     """
-    This class handles the simulation of flow around a cylindrical obstacle inside a channel.
+    Simulation solver for 2D channel flow past an immersed circular cylinder.
 
-    This class extends the base Navier-Stokes solver to handle a solid circular obstacle within the domain.
-    It implements a channel flow setup with a constant velocity inlet, a constant pressure outlet,
-    no-slip walls (top/bottom), and a no-slip cylinder boundary.
+    Extends the base Navier-Stokes solver to model flow separation, wake recirculation,
+    and vortex shedding (Kármán vortex street) past a solid circular obstacle.
 
     Parameters
     ----------
+    grid : Grid
+        Spatial grid discretization of the channel domain.
+    rho : float
+        Fluid density.
+    nu : float
+        Kinematic viscosity.
+    dt : float
+        Initial time step size.
     cylinder_center : tuple[float, float]
-        Physical coordinates (xc, yc) of the cylinder's center.
+        Physical coordinates ``(xc, yc)`` of the cylinder's center.
     cylinder_radius : float
-        Physical radius of the cylinder.
+        Physical radius of the circular cylinder.
     u_inlet : float, default=1.0
         Uniform horizontal velocity imposed at the channel inlet.
+
+    Attributes
+    ----------
+    obstacle_mask : np.ndarray
+        Boolean mask array of shape ``(ny, nx)`` where True represents solid obstacle cells.
+    reynolds_number : float
+        Reynolds number :math:`Re = u_{\\text{inlet}} (2 r) / \\nu`.
     """
 
     cylinder_center: tuple[float, float]
@@ -348,7 +402,7 @@ class CylinderSimulation(SimulationClass):
         Initialize the cylinder simulation by creating the obstacle mask and 
         pre-computing the nearest fluid nodes for pressure boundary conditions.
 
-        To apply the pressure boundary condition :math:`\\frac{\partial p}{\partial n} = 0`
+        To apply the pressure boundary condition :math:`\frac{\partial p}{\partial n} = 0`
         on the surface of the cylinder, each obstacle node is mapped to its closest fluid neighbor.
         During the pressure Poisson iterations, the pressure on the obstacle cells is updated
         by copying the value of their nearest fluid neighbors. 
@@ -473,6 +527,11 @@ class CylinderSimulation(SimulationClass):
     def reynolds_number(self) -> float:
         """
         Compute the Reynolds number for the flow around the cylinder.
+
+        Returns
+        -------
+        float
+            Reynolds number :math:`Re = u_{\\text{inlet}} (2 r) / \\nu`.
         """
         
         characteristic_length = 2.0 * self.cylinder_radius
