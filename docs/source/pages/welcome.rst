@@ -22,10 +22,69 @@ Features
   * :class:`~ns_solver.simulation.CylinderSimulation`: Channel flow past an immersed circular cylinder with nearest-fluid Neumann pressure and no-slip velocity conditions.
 * **CFD Visual Analytics**: Dedicated visualization tools (:func:`~plots.plot.plot_cavity_flow`, :func:`~plots.plot.plot_cylinder_flow`) generating directional quiver velocity fields, streamlines, pressure contours and vorticity fields.
 
+Installation
+------------
+
+To install and use **NAVTILVS**, clone the GitHub repository and install the package in editable (development) mode.
+
+Clone via HTTPS:
+
+.. code-block:: bash
+
+   git clone https://github.com/fildl/NAVTILVS.git
+   cd NAVTILVS
+
+Or clone via SSH:
+
+.. code-block:: bash
+
+   git clone git@github.com:fildl/NAVTILVS.git
+   cd NAVTILVS
+
+Create and activate a virtual environment (recommended):
+
+.. code-block:: bash
+
+   # Using conda
+   conda create -n navtilvs python=3.12
+   conda activate navtilvs
+
+Install dependencies and the package:
+
+.. code-block:: bash
+
+   python -m pip install -r requirements.txt
+
+Then choose the installation mode:
+
+* **Standard Installation (User Mode)**:
+
+  .. code-block:: bash
+
+     python -m pip install .
+
+* **Development Installation (Editable Mode)**:
+
+  .. code-block:: bash
+
+     python -m pip install -e .
+
+  To also install development and testing tools (``pytest``):
+
+  .. code-block:: bash
+
+     python -m pip install -e ".[dev]"
+
 Requirements
 ------------
 
-**TODO**
+**NAVTILVS** requires Python **>= 3.10** and the following dependencies:
+
+* **Core Libraries**:
+  * ``numpy >= 1.20.0``
+  * ``matplotlib >= 3.4.0``
+* **Development & Testing**:
+  * ``pytest >= 7.0.0``
 
 Simulation Gallery
 ------------------
