@@ -5,21 +5,21 @@ from pathlib import Path
 from ns_solver import Grid
 from ns_solver import centered_diff_x, centered_diff_y
 
-def plot_stream(u : np.ndarray,
-                v : np.ndarray,
-                p : np.ndarray,
-                grid : Grid,
-                rho : float,
-                nu : float,
-                t : float = None,
-                reynolds : float = None,
-                save_path : str = None
-                ) -> None:
+def plot_cavity_flow(u: np.ndarray,
+                     v: np.ndarray,
+                     p: np.ndarray,
+                     grid: Grid,
+                     mode: str = 'velocity',
+                     rho: float = None,
+                     nu: float = None,
+                     t: float = None,
+                     reynolds: float = None,
+                     quiver_density: int = 20,
+                     quiver_scale: float = None,
+                     show_axes: bool = True,
+                     save_path: str = None) -> None:
     """
-    Plot the streamlines of the velocity field and the pressure contours for Cavity flow.
-
-    This function generates a 2D visualization of the cavity simulation results,
-    displaying the pressure field as a contour plot and the velocity field as streamlines.
+    Plot the flow field inside a lid-driven cavity.
 
     Parameters
     ----------
@@ -31,46 +31,102 @@ def plot_stream(u : np.ndarray,
         Pressure field.
     grid : Grid
         Spatial grid of the simulation.
-    rho : float
+    mode : str, default='velocity'
+        Visualization mode:
+        - 'velocity': Velocity magnitude field with 'turbo' colormap and white quiver vectors.
+        - 'stream': Pressure contours overlaid with velocity streamlines.
+        - 'vorticity': Vorticity field with symmetric 'coolwarm' colormap.
+        - 'pressure': Pressure field with 'coolwarm' colormap.
+    rho : float, optional
         Fluid density.
-    nu : float
+    nu : float, optional
         Kinematic viscosity.
     t : float, optional
         Elapsed simulation time in seconds.
     reynolds : float, optional
-        Reynolds number of the simulation. If None, it is calculated as (1.0 * grid.lx) / nu.
+        Reynolds number. If None and nu is provided, calculated as (1.0 * grid.lx) / nu.
+    quiver_density : int, default=20
+        Approximate number of arrows per dimension for the quiver plot in 'velocity' mode.
+    quiver_scale : float, optional
+        Scaling factor for quiver arrow lengths. If None, matplotlib auto-scales.
+    show_axes : bool, default=True
+        Whether to show axis ticks, labels, and title. If False, displays a clean plot frame.
     save_path : str, optional
-        If specified, saves the figure to this path.
+        If specified, saves the figure to this path at 300 DPI.
+
+    Raises
+    ------
+    ValueError
+        If an invalid mode is provided.
     """
-    
+
     X, Y = grid.X, grid.Y
 
-    if reynolds is None:
+    if reynolds is None and nu is not None:
         reynolds = (1.0 * grid.lx) / nu
 
-    title_str = f"Lid-Driven Cavity Flow ($Re = {reynolds:.0f}$)"
-    if t is not None:
-        title_str += f", $t = {t:.2f}\\text{{ s}}$"
+    title_str = "Lid-Driven Cavity Flow"
+    if reynolds is not None:
+        title_str += f" ($Re = {reynolds:.0f}$"
+        if t is not None:
+            title_str += f", $t = {t:.2f}\\text{{ s}}$)"
+        else:
+            title_str += ")"
+    elif t is not None:
+        title_str += f" ($t = {t:.2f}\\text{{ s}}$)"
 
     plt.figure(figsize=(7, 6), dpi=100)
     plt.gca().set_aspect('equal')
 
-    # Plot pressure contours
-    cf = plt.contourf(X, Y, p, alpha=0.5, cmap=cm.viridis)
-    plt.colorbar(cf, label='Pressure (Pa)', fraction=0.046, pad=0.04)
-    plt.contour(X, Y, p, cmap=cm.viridis)
+    if mode == 'velocity':
+        vel_mag = np.sqrt(u**2 + v**2)
+        cf = plt.contourf(X, Y, vel_mag, levels=100, cmap='turbo')
+        plt.colorbar(cf, label='Velocity Magnitude (m/s)', fraction=0.046, pad=0.04)
 
-    # Plot velocity streamlines
-    plt.streamplot(X, Y, u, v, density=1.2)
-    
-    plt.xlabel('x (m)')
-    plt.ylabel('y (m)')
+        # Quiver arrows subsampled
+        step_x = max(1, grid.nx // quiver_density)
+        step_y = max(1, grid.ny // quiver_density)
+        plt.quiver(X[::step_y, ::step_x], Y[::step_y, ::step_x],
+                   u[::step_y, ::step_x], v[::step_y, ::step_x],
+                   color='white', pivot='mid', scale=quiver_scale)
+
+    elif mode == 'stream':
+        cf = plt.contourf(X, Y, p, alpha=0.5, cmap='turbo')
+        plt.colorbar(cf, label='Pressure (Pa)', fraction=0.046, pad=0.04)
+        plt.contour(X, Y, p, cmap='turbo')
+        plt.streamplot(X, Y, u, v, density=1.2, color='white')
+
+    elif mode == 'vorticity':
+        dv_dx = centered_diff_x(v, grid.dx)
+        du_dy = centered_diff_y(u, grid.dy)
+        vorticity = np.zeros_like(u)
+        vorticity[1:-1, 1:-1] = dv_dx - du_dy
+        limit = max(abs(np.nanmin(vorticity)), abs(np.nanmax(vorticity)))
+        if limit == 0.0:
+            limit = 1.0
+        cf = plt.contourf(X, Y, vorticity, levels=100, cmap='coolwarm', vmin=-limit, vmax=limit)
+        plt.colorbar(cf, label='Vorticity (rad/s)', fraction=0.046, pad=0.04)
+
+    elif mode == 'pressure':
+        cf = plt.contourf(X, Y, p, levels=100, cmap='coolwarm')
+        plt.colorbar(cf, label='Pressure (Pa)', fraction=0.046, pad=0.04)
+
+    else:
+        raise ValueError(f"Invalid mode '{mode}'. Expected 'velocity', 'stream', 'vorticity', or 'pressure'.")
+
     plt.xlim(0, grid.lx)
     plt.ylim(0, grid.ly)
-    plt.title(title_str)
+
+    if show_axes:
+        plt.xlabel('x (m)')
+        plt.ylabel('y (m)')
+        plt.title(title_str)
+    else:
+        plt.xticks([])
+        plt.yticks([])
+
     plt.tight_layout()
 
-    # Save figure if requested
     if save_path is not None:
         path = Path(save_path)
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -164,9 +220,9 @@ def plot_cylinder_flow(u: np.ndarray,
         # Mask the obstacle region to avoid plotting it
         vel_mag[obstacle_mask] = np.nan
         
-        plt.contourf(X, Y, vel_mag, levels=100, cmap='viridis')
+        plt.contourf(X, Y, vel_mag, levels=100, cmap='turbo')
         plt.colorbar(label='Velocity Magnitude (m/s)')
-        plt.streamplot(X, Y, u, v, color='black', linewidth=0.8, density=1.5)
+        plt.streamplot(X, Y, u, v, color='white', linewidth=0.8, density=1.5)
         plt.title(f'Velocity Magnitude Field{sub_title}')
 
     elif mode == 'pressure':
@@ -193,7 +249,6 @@ def plot_cylinder_flow(u: np.ndarray,
     plt.gca().set_aspect('equal')
     plt.tight_layout()
 
-    # Save figure if requested
     if save_path is not None:
         path = Path(save_path)
         path.parent.mkdir(parents=True, exist_ok=True)
