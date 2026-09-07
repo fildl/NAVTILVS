@@ -4,13 +4,13 @@ from plots import plot_stream
 
 # Physics parameters
 RHO = 1.0 # Density
-NU = 0.1  # Kinematic viscosity
+NU = 0.01  # Kinematic viscosity
 
 # Define grid
 grid = Grid(lx = 1.0,
             ly = 1.0,
-            nx = 64,
-            ny = 64)
+            nx = 256,
+            ny = 256)
 
 # Define simulation
 simulation = CavitySimulation(grid=grid,
@@ -20,7 +20,8 @@ simulation = CavitySimulation(grid=grid,
 
 # Run simulation
 print("Running solver...")
-u, v, p = simulation.solve(nt=None, t_end=1.0)
+print(f"Reynolds number: {simulation.reynolds_number:.2f}")
+u, v, p = simulation.solve(nt=None, t_end=2.0)
 print(f"Simulation completed! Simulated time: {simulation.t:.3f} s")
 
 # Plot
