@@ -16,10 +16,12 @@ Features
      \Delta t \le \min \left( \text{CFL} \cdot \min\left(\frac{\Delta x}{|u|_{\max}}, \frac{\Delta y}{|v|_{\max}}\right), \; \frac{1}{4\nu} \frac{\Delta x^2 \Delta y^2}{\Delta x^2 + \Delta y^2} \right)
 
 * **Modular Object-Oriented Design**:
+
   * :class:`~ns_solver.grid.Grid`: Handles spatial domain discretization, metric scales, and mesh coordinates.
   * :class:`~ns_solver.simulation.SimulationClass`: Base class managing time integration, adaptive time-stepping, and numerical stability.
   * :class:`~ns_solver.simulation.CavitySimulation`: Solver for the classical Lid-Driven Cavity benchmark problem.
   * :class:`~ns_solver.simulation.CylinderSimulation`: Channel flow past an immersed circular cylinder with nearest-fluid Neumann pressure and no-slip velocity conditions.
+
 * **CFD Visual Analytics**: Dedicated visualization tools (:func:`~plots.plot.plot_cavity_flow`, :func:`~plots.plot.plot_cylinder_flow`) generating directional quiver velocity fields, streamlines, pressure contours and vorticity fields.
 
 Installation
@@ -80,9 +82,12 @@ Requirements
 **NAVTILVS** requires Python **>= 3.10** and the following dependencies:
 
 * **Core Libraries**:
+
   * ``numpy >= 1.20.0``
   * ``matplotlib >= 3.4.0``
+
 * **Testing**:
+
   * ``pytest >= 7.0.0``
 
 Quickstart & Examples
