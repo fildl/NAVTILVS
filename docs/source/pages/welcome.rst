@@ -146,46 +146,46 @@ Or from Python:
 Simulation Gallery
 ------------------
 
-Lid-Driven Cavity Flow
-^^^^^^^^^^^^^^^^^^^^^^
+Lid-Driven Cavity Flow (:math:`Re = 100`, :math:`t = 2.50\text{ s}`)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. figure:: /_static/cavity_velocity.png
    :align: center
    :width: 80%
    :alt: Lid-Driven Cavity Velocity Field
 
-   **Velocity Field** (:math:`Re = 100`, :math:`t = 2.50\text{ s}`): Velocity magnitude overlaid with velocity vectors.
+   **Velocity Field**: Velocity magnitude field overlaid with directional velocity vectors, showing the primary vortex centered at :math:`(x \approx 0.62\text{ m}, y \approx 0.78\text{ m})`.
 
 .. figure:: /_static/cavity_flow.png
    :align: center
    :width: 80%
    :alt: Lid-Driven Cavity Streamlines
 
-   **Streamlines & Pressure Field** (:math:`Re = 100`, :math:`t = 2.50\text{ s}`): Primary recirculating vortex and pressure contours.
+   **Streamlines & Pressure Field**: Velocity streamlines and pressure contours depicting corner stagnation zones and recirculation.
 
-Flow Around a Circular Cylinder
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Flow Past a Circular Cylinder (:math:`Re = 100`, :math:`t = 3.50\text{ s}`)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. figure:: /_static/cylinder_vorticity.png
    :align: center
    :width: 95%
    :alt: Cylinder Wake Vorticity Field
 
-   **Vorticity Field** (:math:`Re = 100`, :math:`t = 3.50\text{ s}`): Alternating vortex demonstrating wake dynamics.
+   **Vorticity Field**: Alternating vortex street demonstrating boundary layer detachment and Kármán wake dynamics.
 
 .. figure:: /_static/cylinder_velocity.png
    :align: center
    :width: 95%
    :alt: Cylinder Velocity Field
 
-   **Velocity Field** (:math:`Re = 100`, :math:`t = 3.50\text{ s}`): Velocity magnitude field with streamlines displaying stagnation and lateral acceleration.
+   **Velocity Field**: Velocity magnitude field with streamlines displaying stagnation, lateral acceleration, and recirculation bubbles.
 
 .. figure:: /_static/cylinder_pressure.png
    :align: center
    :width: 95%
    :alt: Cylinder Pressure Field
 
-   **Pressure Field** (:math:`Re = 100`, :math:`t = 3.50\text{ s}`): High-pressure stagnation zone upstream and low-pressure wake zone.
+   **Pressure Field**: High-pressure stagnation zone on the upstream face and low-pressure wake zone.
 
 References
 ----------
