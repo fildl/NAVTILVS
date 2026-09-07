@@ -9,14 +9,16 @@ def plot_stream(u : np.ndarray,
                 p : np.ndarray,
                 grid : Grid,
                 rho : float,
-                nu : float
+                nu : float,
+                t : float = None,
+                reynolds : float = None,
+                save_path : str = None
                 ) -> None:
     """
-    Plot the streamlines of the velocity field and the pressure contours.
+    Plot the streamlines of the velocity field and the pressure contours for Cavity flow.
 
-    This function generates a 2D visualization of the simulation results,
-    displaying the pressure field as a contour plot and
-    the velocity field as streamlines.
+    This function generates a 2D visualization of the cavity simulation results,
+    displaying the pressure field as a contour plot and the velocity field as streamlines.
 
     Parameters
     ----------
@@ -32,23 +34,42 @@ def plot_stream(u : np.ndarray,
         Fluid density.
     nu : float
         Kinematic viscosity.
+    t : float, optional
+        Elapsed simulation time in seconds.
+    reynolds : float, optional
+        Reynolds number of the simulation. If None, it is calculated as (1.0 * grid.lx) / nu.
+    save_path : str, optional
+        If specified, saves the figure to this path.
     """
     
     X, Y = grid.X, grid.Y
 
-    plt.figure(figsize=(11, 7), dpi=100)
+    if reynolds is None:
+        reynolds = (1.0 * grid.lx) / nu
+
+    title_str = f"Lid-Driven Cavity Flow ($Re = {reynolds:.0f}$)"
+    if t is not None:
+        title_str += f", $t = {t:.2f}\\text{{ s}}$"
+
+    plt.figure(figsize=(7, 6), dpi=100)
+    plt.gca().set_aspect('equal')
 
     # Plot pressure contours
-    plt.contourf(X, Y, p, alpha=0.5, cmap=cm.viridis)
-    plt.colorbar(label='Pressure')
+    cf = plt.contourf(X, Y, p, alpha=0.5, cmap=cm.viridis)
+    plt.colorbar(cf, label='Pressure (Pa)', fraction=0.046, pad=0.04)
     plt.contour(X, Y, p, cmap=cm.viridis)
 
     # Plot velocity streamlines
-    plt.streamplot(X, Y, u, v)
+    plt.streamplot(X, Y, u, v, density=1.2)
     
-    plt.xlabel('X')
-    plt.ylabel('Y')
-    plt.title(f"Final State\n$\\rho = {rho}$, $\\nu = {nu}$")
+    plt.xlabel('x (m)')
+    plt.ylabel('y (m)')
+    plt.title(title_str)
+    plt.tight_layout()
+
+    # Save figure if requested
+    if save_path is not None:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
 
     # Show plot
     plt.show()
@@ -58,7 +79,10 @@ def plot_cylinder_flow(u: np.ndarray,
                        p: np.ndarray,
                        grid: Grid,
                        obstacle_mask: np.ndarray,
-                       mode: str = 'vorticity') -> None:
+                       mode: str = 'vorticity',
+                       t: float = None,
+                       reynolds: float = None,
+                       save_path: str = None) -> None:
     """
     Plot the flow field around a cylinder.
 
@@ -82,6 +106,12 @@ def plot_cylinder_flow(u: np.ndarray,
         - 'vorticity': Plots the vorticity field :math:`(\frac{dv}{dx} - \frac{du}{dy})`.
         - 'velocity': Plots the velocity magnitude field (sqrt(u^2 + v^2)).
         - 'pressure': Plots the pressure field.
+    t : float, optional
+        Elapsed simulation time in seconds.
+    reynolds : float, optional
+        Reynolds number of the simulation.
+    save_path : str, optional
+        If specified, saves the figure to this path.
 
     Raises
     ------
@@ -91,7 +121,19 @@ def plot_cylinder_flow(u: np.ndarray,
 
     X, Y = grid.X, grid.Y
 
-    plt.figure(figsize=(12, 6), dpi=100)
+    # Base title with optional Reynolds and time
+    sub_title = ""
+    if reynolds is not None:
+        sub_title += f" ($Re = {reynolds:.1f}$"
+        if t is not None:
+            sub_title += f", $t = {t:.2f}\\text{{ s}}$)"
+        else:
+            sub_title += ")"
+    elif t is not None:
+        sub_title += f" ($t = {t:.2f}\\text{{ s}}$)"
+
+    plt.figure(figsize=(12, 4.5), dpi=100)
+    plt.gca().set_aspect('equal')
 
     if mode == 'vorticity':
         # Compute vorticity using central differences
@@ -106,13 +148,12 @@ def plot_cylinder_flow(u: np.ndarray,
         
         # Set a symmetric colormap
         limit = max(abs(np.nanmin(vorticity)), abs(np.nanmax(vorticity)))
-        # Set a minimum limit to avoid error if the flow is at rest
         if limit == 0.0:
             limit = 1.0
             
         plt.contourf(X, Y, vorticity, levels=100, cmap='coolwarm', vmin=-limit, vmax=limit)
         plt.colorbar(label='Vorticity (rad/s)')
-        plt.title('Vorticity Field')
+        plt.title(f'Vorticity Field{sub_title}')
 
     elif mode == 'velocity':
         # Compute velocity magnitude
@@ -124,7 +165,7 @@ def plot_cylinder_flow(u: np.ndarray,
         plt.contourf(X, Y, vel_mag, levels=100, cmap='viridis')
         plt.colorbar(label='Velocity Magnitude (m/s)')
         plt.streamplot(X, Y, u, v, color='black', linewidth=0.8, density=1.5)
-        plt.title('Velocity Magnitude Field')
+        plt.title(f'Velocity Magnitude Field{sub_title}')
 
     elif mode == 'pressure':
         # Compute pressure field
@@ -135,7 +176,7 @@ def plot_cylinder_flow(u: np.ndarray,
         
         plt.contourf(X, Y, p_masked, levels=100, cmap='coolwarm')
         plt.colorbar(label='Pressure (Pa)')
-        plt.title('Pressure Field')
+        plt.title(f'Pressure Field{sub_title}')
 
     else:
         raise ValueError(f"Invalid mode '{mode}'. Expected 'vorticity', 'velocity', or 'pressure'.")
@@ -143,8 +184,12 @@ def plot_cylinder_flow(u: np.ndarray,
     # Fill the obstacle region
     plt.contourf(X, Y, obstacle_mask.astype(float), levels=[0.5, 1.5], colors=['#333333'])
 
-    plt.xlabel('X')
-    plt.ylabel('Y')
+    plt.xlabel('x (m)')
+    plt.ylabel('y (m)')
     plt.gca().set_aspect('equal')
     plt.tight_layout()
+
+    if save_path is not None:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+
     plt.show()
