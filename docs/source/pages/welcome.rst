@@ -7,8 +7,8 @@ Features
 --------
 
 * **Incompressible Flow Solver**: Solves the 2D unsteady incompressible Navier–Stokes equations under the Boussinesq/constant-density approximation.
-* **Vectorized Poisson Pressure Solver**: Pressure is computed via an iterative Poisson solver optimized for NumPy vectorization.
 * **First-Order Upwind Scheme**: Automatically selects backward or forward spatial derivatives based on local velocity direction, eliminating unphysical downwind oscillations and preserving numerical stability.
+* **Vectorized Poisson Pressure Solver**: Pressure is computed via an iterative Poisson solver optimized for NumPy vectorization.
 * **Adaptive Dynamic Time Stepping**: Continuously monitors numerical stability constraints at each iteration, satisfying both the convective Courant–Friedrichs–Lewy (CFL) condition and the 2D viscous diffusion limit:
 
   .. math::

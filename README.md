@@ -16,6 +16,37 @@
 
 **NAVTILVS** (**NAV**ier-Stokes **T**wo-dimensional **I**ncompressib**L**e **V**isual **S**olver) is a Python library designed to simulate and visualize 2D incompressible fluid flows using finite difference numerical methods on Cartesian grids.
 
+> **Documentation**: For mathematical derivations, numerical schemes and simulation galleries visit the documentation on [Read the Docs](https://navier-stokes-solver.readthedocs.io/en/latest/).
+
+<div align="center">
+  <img src="imgs/cylinder_vorticity.png" alt="Cylinder Wake Vorticity Field" width="90%"/>
+  <p><i>Flow past a circular cylinder (Re = 100): Kármán vortex street resolved with the upwind finite difference scheme.</i></p>
+</div>
+
+---
+
+## Table of Contents
+
+* [Features](#features)
+* [Installation](#installation)
+* [Quickstart](#quickstart)
+* [Testing](#testing)
+* [Documentation](#documentation)
+* [Contributions](#contributions)
+* [Authors](#authors)
+* [Citation](#citation)
+* [License](#license)
+
+---
+
+## Features
+
+- **2D Incompressible Navier–Stokes Solver**: Solves the 2D unsteady incompressible Navier–Stokes equations under the Boussinesq/constant-density approximation.
+- **First-Order Upwind Differencing**: Automatically selects backward or forward spatial derivatives based on local velocity direction, eliminating unphysical downwind oscillations and preserving numerical stability.
+- **Vectorized Pressure Poisson Solver**: Pressure is computed via an iterative Poisson solver optimized for NumPy vectorization.
+- **Adaptive Dynamic Time Stepping**: Dynamically adjusts $\Delta t$ at each iteration satisfying both convective CFL and 2D viscous diffusion stability limits.
+- **Visual Analytics**: Dedicated visualization tools generating directional quiver velocity fields, streamlines, pressure contours and vorticity fields.
+
 ## Documentation
 
 The full documentation can be found at [NAVTILVS Documentation](https://navier-stokes-solver.readthedocs.io/en/latest/)
