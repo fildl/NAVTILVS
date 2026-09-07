@@ -103,7 +103,7 @@ NAVTILVS can be used both through its command-line interface (CLI) and programma
 Command-Line Interface (CLI)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The script ``main.py`` provides a unified command-line entrypoint to configure, run, and export diagnostic visualizations for both benchmark cases without writing code.
+The script ``main.py`` provides a command-line entrypoint to configure, run, and save plots for both cases.
 
 **Command-line Arguments**:
 
@@ -144,7 +144,7 @@ The script ``main.py`` provides a unified command-line entrypoint to configure, 
 
 1. **Lid-Driven Cavity Benchmark**:
 
-   Runs the classic square cavity problem and generates 4 diagnostic plots:
+   Runs the square cavity problem and generates 4 plots:
 
    .. code-block:: bash
 
@@ -152,7 +152,7 @@ The script ``main.py`` provides a unified command-line entrypoint to configure, 
 
    Generated files in ``imgs/``:
 
-   * ``cavity_velocity.png``: Velocity magnitude field overlaid with directional velocity vectors.
+   * ``cavity_velocity.png``: Velocity magnitude field overlaid with velocity vectors.
    * ``cavity_flow.png``: Velocity streamlines overlaid on the pressure contour field.
    * ``cavity_vorticity.png``: Vorticity contour field highlighting vortex core structures.
    * ``cavity_pressure.png``: Full pressure field distribution.
