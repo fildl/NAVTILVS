@@ -146,7 +146,7 @@ def plot_cylinder_flow(u: np.ndarray,
                        reynolds: float = None,
                        show_axes: bool = True,
                        save_path: str = None) -> None:
-    """
+    r"""
     Plot the flow field around a cylinder.
 
     This function generates a visualization of the pressure, velocity,
@@ -166,7 +166,7 @@ def plot_cylinder_flow(u: np.ndarray,
         Boolean mask where True represents the cylinder obstacle.
     mode : str, default='vorticity'
         The field to plot. Options are:
-        - 'vorticity': Plots the vorticity field :math:`(\frac{dv}{dx} - \frac{du}{dy})`.
+        - 'vorticity': Plots the vorticity field :math:`(\frac{\partial v}{\partial x} - \frac{\partial u}{\partial y})`.
         - 'velocity': Plots the velocity magnitude field (sqrt(u^2 + v^2)) with streamlines.
         - 'pressure': Plots the pressure field.
     t : float, optional
