@@ -187,6 +187,22 @@ Flow Past a Circular Cylinder (:math:`Re = 100`, :math:`t = 3.50\text{ s}`)
 
    **Pressure Field**: High-pressure stagnation zone on the upstream face and low-pressure wake zone.
 
+Testing Suite
+-------------
+
+**NAVTILVS** includes a test suite managed by ``pytest``:
+
+.. code-block:: bash
+
+   pytest tests/ -v
+
+Test files are organized into modular suites:
+
+* ``tests/test_grid.py``: Validates grid spacing, mesh generation, and metric dimensions.
+* ``tests/test_finite_differences.py``: Tests accuracy of centered, backward, forward difference and laplacian operators.
+* ``tests/test_solver.py``: Tests iterative Poisson solver convergence and upwind velocity advection.
+* ``tests/test_simulation_cavity.py``: Verifies Dirichlet/Neumann boundary conditions and global mass conservation.
+* ``tests/test_simulation_cylinder.py``: Checks obstacle geometric masking and immersed boundary conditions.
 References
 ----------
 
