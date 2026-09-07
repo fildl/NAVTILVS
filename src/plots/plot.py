@@ -65,6 +65,8 @@ def plot_stream(u : np.ndarray,
     
     plt.xlabel('x (m)')
     plt.ylabel('y (m)')
+    plt.xlim(0, grid.lx)
+    plt.ylim(0, grid.ly)
     plt.title(title_str)
     plt.tight_layout()
 
@@ -186,6 +188,8 @@ def plot_cylinder_flow(u: np.ndarray,
 
     plt.xlabel('x (m)')
     plt.ylabel('y (m)')
+    plt.xlim(0, grid.lx)
+    plt.ylim(0, grid.ly)
     plt.gca().set_aspect('equal')
     plt.tight_layout()
 
