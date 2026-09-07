@@ -3,6 +3,11 @@ Welcome to NAVTILVS
 
 **NAVTILVS** (**NAV**\ ier-Stokes **T**\ wo-dimensional **I**\ ncompressib\ **L**\ e **V**\ isual **S**\ olver) is a Python library designed to simulate and visualize 2D incompressible fluid flows using finite difference methods on structured Cartesian grids.
 
+.. figure:: /_static/cylinder_velocity.png
+   :align: center
+   :width: 90%
+   :alt: Cylinder Wake Velocity Field
+
 Features
 --------
 
