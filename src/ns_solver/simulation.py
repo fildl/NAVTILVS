@@ -271,11 +271,6 @@ class CavitySimulation(SimulationClass):
         Initial time step size.
     u_lid : float, default=1.0
         Tangential velocity of the moving top lid.
-
-    Attributes
-    ----------
-    reynolds_number : float
-        Reynolds number :math:`Re = u_{\\text{lid}} l_x / \\nu`.
     """
 
     # Define the velocity of the moving lid
@@ -389,8 +384,6 @@ class CylinderSimulation(SimulationClass):
     ----------
     obstacle_mask : np.ndarray
         Boolean mask array of shape ``(ny, nx)`` where True represents solid obstacle cells.
-    reynolds_number : float
-        Reynolds number :math:`Re = u_{\\text{inlet}} (2 r) / \\nu`.
     """
 
     cylinder_center: tuple[float, float]

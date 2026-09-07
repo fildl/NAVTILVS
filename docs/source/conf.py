@@ -25,6 +25,10 @@ extensions = [
 
 autodoc_member_order = 'bysource'
 
+# Napoleon settings to format Attributes cleanly as bulleted field lists
+napoleon_use_ivar = True
+napoleon_use_param = True
+
 templates_path = ['_templates']
 exclude_patterns = []
 
@@ -33,3 +37,16 @@ exclude_patterns = []
 
 html_theme = 'alabaster'
 html_static_path = ['_static']
+
+html_theme_options = {
+    'page_width': '960px',
+    'sidebar_width': '230px',
+    'font_family': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    'head_font_family': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    'code_font_family': 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+    'show_relbars': True,
+}
+
+html_css_files = [
+    'custom.css',
+]

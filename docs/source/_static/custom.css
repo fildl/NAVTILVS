@@ -1,0 +1,175 @@
+/* ==========================================================================
+   NAVTILVS Sphinx Documentation - Custom Stylesheet
+   ========================================================================== */
+
+/* Typography & Body Layout */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.65;
+    color: #1e293b;
+}
+
+div.body {
+    max-width: 920px;
+    margin: 0 auto;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+h1 {
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0.3em;
+    margin-bottom: 1.2em;
+}
+
+/* ==========================================================================
+   API Function, Class, and Method Signatures
+   ========================================================================== */
+
+/* Distinctive signature banner (inspired by sphinx_rtd_theme & ProMeteo) */
+dl.class > dt.sig,
+dl.function > dt.sig,
+dl.method > dt.sig,
+dl.property > dt.sig {
+    display: block;
+    background: #eef6fc;
+    border-left: 5px solid #2b88d8;
+    border-radius: 4px;
+    padding: 10px 14px;
+    margin-top: 2.4rem;
+    margin-bottom: 1rem;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 0.95em;
+    color: #1e293b;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* Attributes (if any) */
+dl.attribute > dt.sig {
+    display: inline-block;
+    background: #f1f5f9;
+    border-left: 3px solid #94a3b8;
+    border-radius: 3px;
+    padding: 4px 8px;
+    margin-top: 1rem;
+    margin-bottom: 0.4rem;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 0.9em;
+    color: #334155;
+}
+
+/* Module prefix (e.g. ns_solver.grid.) */
+dt.sig .descclassname {
+    color: #475569;
+    font-weight: 500;
+}
+
+/* Function or Class name */
+dt.sig .descname {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* Parameter list */
+dt.sig .sig-param {
+    font-style: italic;
+    color: #0369a1;
+}
+
+/* Property tag (e.g. "class", "property") */
+dt.sig .property {
+    color: #64748b;
+    font-weight: 600;
+    margin-right: 0.25em;
+}
+
+/* Return arrow and typehint */
+dt.sig .sig-return {
+    color: #0284c7;
+    font-weight: 600;
+}
+
+/* Permalink icon */
+dt.sig a.headerlink {
+    color: #94a3b8;
+    margin-left: 0.5em;
+    text-decoration: none;
+}
+
+dt.sig:hover a.headerlink {
+    color: #2b88d8;
+}
+
+/* Spacing and divider between class/function blocks */
+dl.py {
+    margin-bottom: 2.8rem;
+}
+
+dd {
+    margin-left: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+/* ==========================================================================
+   Parameters, Returns, and Field Lists
+   ========================================================================== */
+
+dl.field-list {
+    display: grid !important;
+    grid-template-columns: max-content 1fr !important;
+    column-gap: 1.2rem;
+    row-gap: 0.6rem;
+    align-items: baseline;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 12px 18px;
+    background-color: #f8fafc;
+    border-left: 3px solid #cbd5e1;
+    border-radius: 4px;
+}
+
+dl.field-list > dt {
+    font-weight: 700;
+    color: #334155;
+    margin: 0 !important;
+    padding: 0 !important;
+    white-space: nowrap;
+}
+
+dl.field-list > dd {
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #1e293b;
+}
+
+dl.field-list > dd > p {
+    margin: 0 !important;
+}
+
+dl.field-list > dd > p + p {
+    margin-top: 0.4rem !important;
+}
+
+dl.field-list ul.simple {
+    padding-left: 1.2rem;
+    margin: 0 !important;
+}
+
+dl.field-list ul.simple li {
+    margin-bottom: 0.35rem;
+}
+
+dl.field-list ul.simple li:last-child {
+    margin-bottom: 0;
+}
+
+/* Code blocks inside documentation */
+div.highlight {
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
