@@ -16,8 +16,6 @@
 
 **NAVTILVS** (**NAV**ier-Stokes **T**wo-dimensional **I**ncompressib**L**e **V**isual **S**olver) is a Python library designed to simulate and visualize 2D incompressible fluid flows using finite difference numerical methods on Cartesian grids.
 
-> **Documentation**: For mathematical derivations, numerical schemes and simulation galleries visit the documentation on [Read the Docs](https://navier-stokes-solver.readthedocs.io/en/latest/).
-
 <div align="center">
   <img src="docs/source/_static/cylinder_velocity.png" alt="Cylinder Wake Velocity Field" width="90%"/>
   <p><i>Flow past a circular cylinder (Re = 100): Kármán vortex street resolved with the upwind finite difference scheme.</i></p>
