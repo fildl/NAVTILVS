@@ -1,5 +1,4 @@
-from ns_solver import Grid
-from ns_solver import CylinderSimulation
+from ns_solver import Grid, CylinderSimulation
 from plots import plot_cylinder_flow
 
 # Physics parameters

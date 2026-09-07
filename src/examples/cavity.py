@@ -1,5 +1,4 @@
-from ns_solver import Grid
-from ns_solver import CavitySimulation
+from ns_solver import Grid, CavitySimulation
 from plots import plot_cavity_flow
 
 # Physics parameters

@@ -14,7 +14,7 @@
 
 # NAVTILVS
 
-NAVTILVS (**NAV**ier-Stokes **T**wo-dimensional **I**ncompressib**L**e **V**isual **S**olver) is a 2D incompressible Navier–Stokes solver written in Python.
+**NAVTILVS** (**NAV**ier-Stokes **T**wo-dimensional **I**ncompressib**L**e **V**isual **S**olver) is a Python library designed to simulate and visualize 2D incompressible fluid flows using finite difference numerical methods on Cartesian grids.
 
 ## Documentation
 
