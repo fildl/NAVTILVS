@@ -1,8 +1,14 @@
 <div align="center">
 
-|Author|Documentation|Code Quality|
-|:----:|:-----------:|:----------:|
-|Filippo Di Ludovico |[![Documentation Status](https://readthedocs.org/projects/navier-stokes-solver/badge/?version=latest)](https://navier-stokes-solver.readthedocs.io/en/latest/?badge=latest)| [![Codacy Badge](https://app.codacy.com/project/badge/Grade/c186675c861548b39c1c3ede696e2ae4)](https://app.codacy.com/gh/fildl/NAVTILVS/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)|
+| **Author** | **Project** | **Documentation** | **Build Status** | **Code Quality** | **License** |
+|:----------:|:-----------:|:-----------------:|:----------------:|:----------------:|:-----------:|
+| **Filippo Di Ludovico** | **NAVTILVS** | [![Documentation Status](https://readthedocs.org/projects/navier-stokes-solver/badge/?version=latest)](https://navier-stokes-solver.readthedocs.io/en/latest/?badge=latest) | [![Python CI](https://github.com/fildl/NAVTILVS/actions/workflows/python.yml/badge.svg)](https://github.com/fildl/NAVTILVS/actions/workflows/python.yml) | [![Codacy Badge](https://app.codacy.com/project/badge/Grade/c186675c861548b39c1c3ede696e2ae4)](https://app.codacy.com/gh/fildl/NAVTILVS/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade) | [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) |
+
+<br/>
+
+![Python version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue.svg)
+[![GitHub issues](https://img.shields.io/github/issues/fildl/NAVTILVS.svg)](https://github.com/fildl/NAVTILVS/issues)
+[![GitHub stars](https://img.shields.io/github/stars/fildl/NAVTILVS.svg?style=social)](https://github.com/fildl/NAVTILVS/stargazers)
 
 </div>
 
