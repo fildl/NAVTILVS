@@ -3,7 +3,7 @@
 
 from .__version__ import __version__
 from .grid import Grid
-from .simulation import SimulationClass, CavitySimulation, CylinderSimulation
+from .simulation import SimulationClass, CavitySimulation, CylinderSimulation, load_fields
 from .solver import build_up_b, pressure_poisson, update_velocity
 from .finite_differences import (
     backward_diff_x, backward_diff_y,
@@ -23,6 +23,7 @@ __all__ = [
     "SimulationClass",
     "CavitySimulation",
     "CylinderSimulation",
+    "load_fields",
     "build_up_b",
     "pressure_poisson",
     "update_velocity",

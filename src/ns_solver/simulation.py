@@ -5,6 +5,8 @@ __author__ = ['Filippo Di Ludovico']
 __email__ = ['filippo.diludovico@studio.unibo.it']
 
 from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
 import numpy as np
 from .grid import Grid
 from .solver import build_up_b, pressure_poisson, update_velocity
@@ -215,7 +217,9 @@ class SimulationClass:
         
     def solve(self,
               t_end : float = None,
-              nt : int = None
+              nt : int = None,
+              save_interval : float = None,
+              save_dir : str | Path = None
               ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Solve the Navier-Stokes equations.
@@ -227,9 +231,15 @@ class SimulationClass:
         Parameters
         ----------
         t_end : float, optional
-            Target time to reach (in seconds).
+            Target physical time to reach (in seconds).
         nt : int, optional
             Number of time steps to simulate.
+        save_interval : float, optional
+            Physical time interval in seconds between checkpoint saves.
+            If specified, intermediate fields are saved to compressed .npz archives.
+        save_dir : str or Path, optional
+            Directory where checkpoint .npz files will be written.
+            Defaults to "checkpoints" if save_interval is specified.
 
         Returns
         -------
@@ -239,17 +249,33 @@ class SimulationClass:
         Raises
         ------
         ValueError
-            If neither or both parameters are specified.
+            If neither or both parameters 't_end' and 'nt' are specified,
+            or if 'save_interval' is non-positive.
         """
 
         if t_end is None and nt is None:
             raise ValueError("You must specify at least one of 't_end' or 'nt'.")
         if t_end is not None and nt is not None:
             raise ValueError("You cannot specify both 't_end' and 'nt'.")
-        
+        if save_interval is not None and save_interval <= 0:
+            raise ValueError("Save interval must be strictly positive.")
+
+        save_path_dir = None
+        frame = 0
+        last_save_t = self.t
+        if save_interval is not None:
+            save_path_dir = Path("checkpoints" if save_dir is None else save_dir)
+            save_path_dir.mkdir(parents=True, exist_ok=True)
+            self.save_fields(save_path_dir / f"fields_{frame:04d}_t{self.t:.3f}.npz")
+            frame += 1
+
         if nt is not None:
             for _ in range(nt):
                 self.step()
+                if save_interval is not None and (self.t - last_save_t >= save_interval - 1e-12):
+                    self.save_fields(save_path_dir / f"fields_{frame:04d}_t{self.t:.3f}.npz")
+                    last_save_t = self.t
+                    frame += 1
         else:
             # Simulate until reaching t_end
             # We include a 1e-8 tolerance to avoid too small dt
@@ -262,7 +288,68 @@ class SimulationClass:
                 
                 self.step(dt_override=dt)
 
+                if save_interval is not None and (self.t - last_save_t >= save_interval - 1e-12):
+                    self.save_fields(save_path_dir / f"fields_{frame:04d}_t{self.t:.3f}.npz")
+                    last_save_t = self.t
+                    frame += 1
+
+        # Always save final state if save_interval is active and final state wasn't just saved
+        if save_interval is not None and abs(self.t - last_save_t) > 1e-8:
+            self.save_fields(save_path_dir / f"fields_{frame:04d}_t{self.t:.3f}.npz")
+
         return self.u, self.v, self.p
+
+    def save_fields(self,
+                    filepath : str | Path
+                    ) -> Path:
+        """
+        Save the current fluid dynamic fields and simulation state to a compressed NumPy .npz file.
+
+        Parameters
+        ----------
+        filepath : str or Path
+            Target destination path for the .npz archive.
+
+        Returns
+        -------
+        Path
+            Path object pointing to the saved file.
+        """
+
+        path = Path(filepath)
+        if path.suffix != ".npz":
+            path = path.with_suffix(".npz")
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Retrieve Reynolds number if subclass defines it
+        reynolds = getattr(self, "reynolds_number", None)
+        re_val = float(reynolds) if reynolds is not None else np.nan
+
+        # Retrieve obstacle mask if defined
+        obstacle_mask = getattr(self, "obstacle_mask", None)
+        if obstacle_mask is None:
+            obstacle_mask = np.zeros((self.grid.ny, self.grid.nx), dtype=bool)
+
+        np.savez_compressed(
+            path,
+            u=self.u,
+            v=self.v,
+            p=self.p,
+            x=np.linspace(0, self.grid.lx, self.grid.nx),
+            y=np.linspace(0, self.grid.ly, self.grid.ny),
+            obstacle_mask=obstacle_mask,
+            t=float(self.t),
+            reynolds=re_val,
+            rho=float(self.rho),
+            nu=float(self.nu),
+            dt=float(self.dt),
+            nx=int(self.grid.nx),
+            ny=int(self.grid.ny),
+            lx=float(self.grid.lx),
+            ly=float(self.grid.ly),
+        )
+
+        return path
     
 @dataclass
 class CavitySimulation(SimulationClass):
@@ -543,3 +630,70 @@ class CylinderSimulation(SimulationClass):
         
         characteristic_length = 2.0 * self.cylinder_radius
         return (self.u_inlet * characteristic_length) / self.nu
+
+def load_fields(filepath : str | Path) -> dict[str, Any]:
+    """
+    Load simulation fields and metadata from a compressed NumPy .npz file.
+
+    Parameters
+    ----------
+    filepath : str or Path
+        Path to the .npz archive file.
+
+    Returns
+    -------
+    dict[str, Any]
+        Dictionary containing loaded arrays and metadata:
+        - 'u': velocity field in x-direction with shape ``(ny, nx)``
+        - 'v': velocity field in y-direction with shape ``(ny, nx)``
+        - 'p': pressure field with shape ``(ny, nx)``
+        - 'x': 1D array of grid coordinates along x
+        - 'y': 1D array of grid coordinates along y
+        - 'obstacle_mask': 2D boolean mask indicating obstacle cells
+        - 't': simulation physical time in seconds
+        - 'reynolds': Reynolds number, or None if undefined
+        - 'rho': fluid density
+        - 'nu': kinematic viscosity
+        - 'dt': time step size
+        - 'nx': number of grid points along x
+        - 'ny': number of grid points along y
+        - 'lx': physical domain length in x
+        - 'ly': physical domain length in y
+
+    Raises
+    ------
+    FileNotFoundError
+        If the specified file does not exist.
+    """
+
+    path = Path(filepath)
+    if not path.is_file():
+        if path.suffix != ".npz" and path.with_suffix(".npz").is_file():
+            path = path.with_suffix(".npz")
+        else:
+            raise FileNotFoundError(f"Simulation fields file not found: '{filepath}'")
+
+    with np.load(path) as data:
+        re_val = float(data["reynolds"]) if "reynolds" in data else None
+        if re_val is not None and np.isnan(re_val):
+            re_val = None
+
+        result = {
+            "u": np.array(data["u"]),
+            "v": np.array(data["v"]),
+            "p": np.array(data["p"]),
+            "x": np.array(data["x"]),
+            "y": np.array(data["y"]),
+            "obstacle_mask": np.array(data["obstacle_mask"]) if "obstacle_mask" in data else None,
+            "t": float(data["t"]) if "t" in data else 0.0,
+            "reynolds": re_val,
+            "rho": float(data["rho"]) if "rho" in data else 1.0,
+            "nu": float(data["nu"]) if "nu" in data else 0.0,
+            "dt": float(data["dt"]) if "dt" in data else 0.0,
+            "nx": int(data["nx"]) if "nx" in data else data["u"].shape[1],
+            "ny": int(data["ny"]) if "ny" in data else data["u"].shape[0],
+            "lx": float(data["lx"]) if "lx" in data else (data["x"][-1] if "x" in data else 1.0),
+            "ly": float(data["ly"]) if "ly" in data else (data["y"][-1] if "y" in data else 1.0),
+        }
+
+    return result

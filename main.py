@@ -17,7 +17,9 @@ def run_cavity(reynolds: float = 100.0,
                nx: int = 128,
                ny: int = 128,
                t_end: float = 2.5,
-               output_dir: str = "imgs") -> None:
+               output_dir: str = "imgs",
+               save_data: bool = False,
+               save_interval: float = None) -> None:
     """
     Run the Lid-Driven Cavity simulation and generate plots.
 
@@ -33,6 +35,10 @@ def run_cavity(reynolds: float = 100.0,
         Target physical simulation time in seconds.
     output_dir : str, default="imgs"
         Directory where generated diagnostic figures will be saved.
+    save_data : bool, default=False
+        Whether to save final simulation fields to a compressed NumPy .npz archive.
+    save_interval : float, optional
+        Physical time interval in seconds for saving intermediate field checkpoints.
     """
 
     out_path = Path(output_dir)
@@ -48,14 +54,25 @@ def run_cavity(reynolds: float = 100.0,
     print(f" Grid: {nx} x {ny} | Domain: {lx} m x {ly} m")
     print(f" Reynolds number: Re = {reynolds:.1f} | Kinematic Viscosity: nu = {nu:.5f} m^2/s")
     print(f" Target Simulation Time: t_end = {t_end:.2f} s")
+    if save_interval is not None:
+        print(f" Checkpoint Interval: every {save_interval:.3f} s")
     print("=" * 65)
 
     grid = Grid(lx=lx, ly=ly, nx=nx, ny=ny)
     sim = CavitySimulation(grid=grid, rho=rho, nu=nu, dt=0.001)
 
     print("Running Navier-Stokes solver...")
-    u, v, p = sim.solve(t_end=t_end)
+    chk_dir = out_path / "checkpoints" if save_interval is not None else None
+    u, v, p = sim.solve(t_end=t_end, save_interval=save_interval, save_dir=chk_dir)
     print(f"Simulation completed! Simulated physical time: {sim.t:.3f} s\n")
+
+    # Save final fields if requested
+    if save_data and save_interval is None:
+        save_file = out_path / "cavity_fields.npz"
+        sim.save_fields(save_file)
+        print(f"  -> Saved simulation fields -> {save_file}")
+    elif save_interval is not None:
+        print(f"  -> Periodic field checkpoints saved to '{chk_dir}/'")
 
     # Generate diagnostic plots
     modes = [
@@ -77,7 +94,9 @@ def run_cylinder(reynolds: float = 100.0,
                  nx: int = 256,
                  ny: int = 64,
                  t_end: float = 3.5,
-                 output_dir: str = "imgs") -> None:
+                 output_dir: str = "imgs",
+                 save_data: bool = False,
+                 save_interval: float = None) -> None:
     """
     Run the Flow Past a Cylinder simulation and generate plots.
 
@@ -93,6 +112,10 @@ def run_cylinder(reynolds: float = 100.0,
         Target physical simulation time in seconds.
     output_dir : str, default="imgs"
         Directory where generated diagnostic figures will be saved.
+    save_data : bool, default=False
+        Whether to save final simulation fields to a compressed NumPy .npz archive.
+    save_interval : float, optional
+        Physical time interval in seconds for saving intermediate field checkpoints.
     """
 
     out_path = Path(output_dir)
@@ -112,6 +135,8 @@ def run_cylinder(reynolds: float = 100.0,
     print(f" Obstacle: Center {center}, Diameter D = {diameter:.2f} m")
     print(f" Reynolds number: Re = {reynolds:.1f} | Kinematic Viscosity: nu = {nu:.5f} m^2/s")
     print(f" Target Simulation Time: t_end = {t_end:.2f} s")
+    if save_interval is not None:
+        print(f" Checkpoint Interval: every {save_interval:.3f} s")
     print("=" * 65)
 
     grid = Grid(lx=lx, ly=ly, nx=nx, ny=ny)
@@ -120,8 +145,17 @@ def run_cylinder(reynolds: float = 100.0,
                              u_inlet=u_inlet)
 
     print("Running Navier-Stokes solver...")
-    u, v, p = sim.solve(t_end=t_end)
+    chk_dir = out_path / "checkpoints" if save_interval is not None else None
+    u, v, p = sim.solve(t_end=t_end, save_interval=save_interval, save_dir=chk_dir)
     print(f"Simulation completed! Simulated physical time: {sim.t:.3f} s\n")
+
+    # Save final fields if requested
+    if save_data and save_interval is None:
+        save_file = out_path / "cylinder_fields.npz"
+        sim.save_fields(save_file)
+        print(f"  -> Saved simulation fields -> {save_file}")
+    elif save_interval is not None:
+        print(f"  -> Periodic field checkpoints saved to '{chk_dir}/'")
 
     # Generate all three diagnostic plots
     modes = [
@@ -190,6 +224,18 @@ def parse_args():
         default="imgs",
         help="Directory where output plots will be saved (default: imgs)",
     )
+    parser.add_argument(
+        "--save-data",
+        action="store_true",
+        default=False,
+        help="Save final simulation fields (u, v, p) to a compressed NumPy .npz archive",
+    )
+    parser.add_argument(
+        "--save-interval",
+        type=float,
+        default=None,
+        help="Physical time interval in seconds for saving intermediate field snapshots (default: None)",
+    )
     return parser.parse_args()
 
 def main():
@@ -203,13 +249,19 @@ def main():
         nx = args.nx if args.nx is not None else 128
         ny = args.ny if args.ny is not None else 128
         t_end = args.tend if args.tend is not None else 2.5
-        run_cavity(reynolds=args.re, nx=nx, ny=ny, t_end=t_end, output_dir=args.output_dir)
+        run_cavity(reynolds=args.re, nx=nx, ny=ny, t_end=t_end,
+                   output_dir=args.output_dir,
+                   save_data=args.save_data,
+                   save_interval=args.save_interval)
 
     elif args.sim == "cylinder":
         nx = args.nx if args.nx is not None else 256
         ny = args.ny if args.ny is not None else 64
         t_end = args.tend if args.tend is not None else 3.5
-        run_cylinder(reynolds=args.re, nx=nx, ny=ny, t_end=t_end, output_dir=args.output_dir)
+        run_cylinder(reynolds=args.re, nx=nx, ny=ny, t_end=t_end,
+                     output_dir=args.output_dir,
+                     save_data=args.save_data,
+                     save_interval=args.save_interval)
 
 if __name__ == "__main__":
     main()
