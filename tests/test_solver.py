@@ -203,6 +203,27 @@ def test_pressure_poisson_quadratic():
     
     assert np.allclose(p, X**2 + Y**2, rtol=TOLERANCE)
 
+def test_pressure_poisson_early_stopping_with_tolerance():
+    """
+    Verify that pressure_poisson stops early when field difference is below tol.
+    """
+
+    p = np.ones((10, 10)) * 3.0
+    b = np.zeros((10, 10))
+    
+    # List that acts as a counter: on each iteration we append an element
+    iterations = []
+    def counting_bc(x):
+        iterations.append(1)
+        return x
+
+    # p is already an exact solution, so diff is 0 after 1 iteration
+    p_res = pressure_poisson(p, dx=0.1, dy=0.1, b=b, boundary_conditions=counting_bc, max_iter=500, tol=1e-4)
+
+    # Must exit after 1 iteration instead of running all 500 iterations
+    assert len(iterations) == 1
+    assert np.allclose(p_res, 3.0, rtol=TOLERANCE)
+
 # ==========================================
 # update_velocity Tests
 # ==========================================

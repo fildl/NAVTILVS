@@ -26,6 +26,14 @@ def test_simulation_invalid_inputs():
     with pytest.raises(ValueError):
         SimulationClass(grid=grid, rho=1.0, nu=0.1, dt=-0.001)
 
+    # Non-positive p_max_iter
+    with pytest.raises(ValueError):
+        SimulationClass(grid=grid, rho=1.0, nu=0.1, dt=0.001, p_max_iter=-1)
+
+    # Non-positive p_tol
+    with pytest.raises(ValueError):
+        SimulationClass(grid=grid, rho=1.0, nu=0.1, dt=0.001, p_tol=-1e-4)
+
 def test_simulation_initialization():
     """
     Test if the base SimulationClass initializes grids and fields correctly.
@@ -43,6 +51,14 @@ def test_simulation_initialization():
     assert sim.rho == 1.2
     assert sim.nu == 0.01
     assert sim.dt == 0.002
+    assert sim.p_max_iter == 500
+    assert sim.p_tol is None
+
+    # Check custom Poisson parameters
+    sim_custom = SimulationClass(grid=grid, rho=1.2, nu=0.01, dt=0.002,
+                                 p_max_iter=300, p_tol=1e-3)
+    assert sim_custom.p_max_iter == 300
+    assert sim_custom.p_tol == 1e-3
 
     # Check that velocity and pressure fields are initialized correctly
     assert sim.u.shape == (10, 15)
