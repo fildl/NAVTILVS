@@ -247,3 +247,6 @@ TODO.md
 
 # Local imgs folder
 imgs/
+
+# Local npz files
+*.npz
