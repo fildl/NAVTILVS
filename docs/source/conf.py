@@ -23,6 +23,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
+    'sphinx.ext.viewcode',
 ]
 
 autodoc_member_order = 'bysource'
