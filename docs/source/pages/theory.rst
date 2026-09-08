@@ -161,8 +161,8 @@ At each simulation step, the active time step is dynamically evaluated as:
 
 .. _reynolds_number:
 
-Dimensionless Analysis and Reynolds Number
-------------------------------------------
+Dimensional Analysis
+--------------------
 
 The **Reynolds number** (:math:`Re`) represents the ratio of inertial forces to viscous forces in a fluid:
 
@@ -204,40 +204,116 @@ The physical flow regimes past a circular cylinder vary drastically with :math:`
 * (:math:`Re > 180`):
   In physical experiments, secondary three-dimensional instabilities emerge, transitioning toward turbulence. Because **NAVTILVS** solves the two-dimensional Navier–Stokes equations, it cannot capture spanwise vortex stretching.
 
+.. _boundary_conditions:
 .. _obstacle_modeling:
 
-Obstacle Modeling and Boundary Conditions
------------------------------------------
+Boundary Conditions
+-------------------
 
-To simulate arbitrary geometry within a structured Cartesian grid, a boolean mask :math:`M` is defined over all spatial nodes:
+To close the system of differential equations, appropriate boundary conditions must be prescribed for both velocity and pressure.
 
-.. math::
-   M_{i,j} = 
-   \begin{cases} 
-   1 & \text{if node } (i,j) \text{ lies within the solid obstacle} \\
-   0 & \text{otherwise (fluid)}
-   \end{cases}
+Lid-Driven Cavity Flow
+~~~~~~~~~~~~~~~~~~~~~~
 
-Boundary conditions on the immersed obstacle are enforced as follows:
+The Lid-Driven Cavity benchmark (:class:`~ns_solver.simulation.CavitySimulation`) models recirculating viscous flow within a closed square domain :math:`\Omega = [0, L_x] \times [0, L_y]`.
 
-1. **Velocity No-Slip**:
-   Fluid adheres to the solid surface:
+1. **Velocity Boundary Conditions**:
+   The flow is driven entirely by the tangential shear of the moving upper lid, while the side and bottom walls remain stationary:
+
+   * **Top moving lid** (:math:`y = L_y`):
+     Imposes a constant horizontal velocity :math:`u = u_{\text{lid}}` and zero vertical penetration:
+
+     .. math::
+        u(x, L_y) = u_{\text{lid}}, \quad v(x, L_y) = 0 \implies u_{n_y-1, j} = u_{\text{lid}}, \; v_{n_y-1, j} = 0
+
+   * **Stationary walls** (:math:`x = 0`, :math:`x = L_x`, :math:`y = 0`):
+     Impose no-slip and impermeability Dirichlet conditions:
+
+     .. math::
+        u(0, y) = 0, \quad v(0, y) = 0 \quad (\text{Left wall}) \implies u_{i, 0} = 0, \; v_{i, 0} = 0
+
+     .. math::
+        u(L_x, y) = 0, \quad v(L_x, y) = 0 \quad (\text{Right wall}) \implies u_{i, n_x-1} = 0, \; v_{i, n_x-1} = 0
+
+     .. math::
+        u(x, 0) = 0, \quad v(x, 0) = 0 \quad (\text{Bottom wall}) \implies u_{0, j} = 0, \; v_{0, j} = 0
+
+2. **Pressure Boundary Conditions**:
+   Evaluating the normal momentum equation at solid impermeable walls yields a homogeneous Neumann condition :math:`\frac{\partial p}{\partial n} = 0`, discretized via first-order one-sided finite differences:
 
    .. math::
-      u_{i,j} = 0, \quad v_{i,j} = 0 \quad \forall (i,j) \text{ such that } M_{i,j} = 1
-
-2. **Pressure Zero Normal Gradient**:
-   The physical boundary condition on an impermeable wall is :math:`\frac{\partial p}{\partial n} = 0`. On a Cartesian staircased grid, this is enforced by projecting the pressure of each obstacle node to its closest fluid neighbor:
+      \left. \frac{\partial p}{\partial x} \right|_{x=0} = 0 \implies p_{i, 0} = p_{i, 1} \quad (\text{Left wall})
 
    .. math::
-      p_{i,j} = p_{\text{nearest fluid}(i,j)} \quad \forall (i,j) \text{ such that } M_{i,j} = 1
-
-   The mapping from obstacle cells to the closest fluid nodes is precomputed once during initialization using Euclidean distances:
+      \left. \frac{\partial p}{\partial x} \right|_{x=L_x} = 0 \implies p_{i, n_x-1} = p_{i, n_x-2} \quad (\text{Right wall})
 
    .. math::
-      \text{nearest fluid}(i, j) = \arg\min_{(k, l) \notin M} \left[ \left((i - k)\Delta y\right)^2 + \left((j - l)\Delta x\right)^2 \right]
+      \left. \frac{\partial p}{\partial y} \right|_{y=0} = 0 \implies p_{0, j} = p_{1, j} \quad (\text{Bottom wall})
 
-   During each iteration of the pressure Poisson solver, this mapping is applied as a vectorized 1-to-1 array copy, maintaining zero overhead while ensuring a smooth pressure profile across the solid interface.
+   Because an incompressible Poisson problem with pure Neumann boundary conditions everywhere is determined only up to an arbitrary additive constant, a reference Dirichlet condition is prescribed at the top lid:
+
+   .. math::
+      p(x, L_y) = 0 \implies p_{n_y-1, j} = 0 \quad (\text{Top lid})
+
+Flow Past an Immersed Cylinder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The cylinder benchmark (:class:`~ns_solver.simulation.CylinderSimulation`) models channel flow past a solid circular obstacle inside a rectangular domain :math:`[0, L_x] \times [0, L_y]`.
+
+1. **Channel Boundary Conditions**:
+
+   * **Inlet** (:math:`x = 0`):
+     Prescribes uniform horizontal inflow and zero normal pressure gradient:
+
+     .. math::
+        u(0, y) = u_{\text{inlet}}, \quad v(0, y) = 0, \quad \frac{\partial p}{\partial x} = 0 \implies p_{i, 0} = p_{i, 1}
+
+   * **Outlet** (:math:`x = L_x`):
+     Imposes convective zero-gradient velocity outflow and a constant reference pressure datum:
+
+     .. math::
+        \frac{\partial u}{\partial x} = 0 \implies u_{i, n_x-1} = u_{i, n_x-2}, \quad
+        \frac{\partial v}{\partial x} = 0 \implies v_{i, n_x-1} = v_{i, n_x-2}
+
+     .. math::
+        p(L_x, y) = 0 \implies p_{i, n_x-1} = 0
+
+   * **Top and Bottom Channel Walls** (:math:`y = 0`, :math:`y = L_y`):
+     Solid no-slip impermeable walls with zero normal pressure gradient:
+
+     .. math::
+        u = 0, \quad v = 0, \quad \frac{\partial p}{\partial y} = 0 \implies p_{0, j} = p_{1, j}, \; p_{n_y-1, j} = p_{n_y-2, j}
+
+2. **Obstacle Modeling and Immersed Boundary Conditions**:
+   To represent arbitrary obstacle geometry within a structured Cartesian grid, a boolean mask :math:`M` is defined over all spatial nodes:
+
+   .. math::
+      M_{i,j} = 
+      \begin{cases} 
+      1 & \text{if node } (i,j) \text{ lies within the solid obstacle} \\
+      0 & \text{otherwise (fluid)}
+      \end{cases}
+
+   Boundary conditions on the immersed obstacle are enforced as follows:
+
+   * **Velocity No-Slip**:
+     Fluid adheres to the solid surface:
+
+     .. math::
+        u_{i,j} = 0, \quad v_{i,j} = 0 \quad \forall (i,j) \text{ such that } M_{i,j} = 1
+
+   * **Pressure Zero Normal Gradient**:
+     The physical boundary condition on an impermeable wall is :math:`\frac{\partial p}{\partial n} = 0`. On a Cartesian staircased grid, this is enforced by projecting the pressure of each obstacle node to its closest fluid neighbor:
+
+     .. math::
+        p_{i,j} = p_{\text{nearest fluid}(i,j)} \quad \forall (i,j) \text{ such that } M_{i,j} = 1
+
+     The mapping from obstacle cells to the closest fluid nodes is precomputed once during initialization using Euclidean distances:
+
+     .. math::
+        \text{nearest fluid}(i, j) = \arg\min_{(k, l) \notin M} \left[ \left((i - k)\Delta y\right)^2 + \left((j - l)\Delta x\right)^2 \right]
+
+     During each iteration of the pressure Poisson solver, this mapping is applied as a vectorized 1-to-1 array copy, maintaining zero computational overhead while ensuring a smooth pressure profile across the solid interface.
 
 References
 ----------
