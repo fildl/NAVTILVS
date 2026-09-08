@@ -142,7 +142,7 @@ To ensure stability in explicit time marching, the time step :math:`\Delta t` mu
    where :math:`C_{\text{cfl}} < 1` is the Courant safety factor (default: :math:`0.5`).
 
 2. **Viscous Stability (Diffusion Limit)**:
-   In explicit diffusion schemes, von Neumann stability analysis in 2D establishes (Hirsch, 2007) [1]_:
+   In explicit diffusion schemes, von Neumann stability analysis in 2D establishes (Hirsch, 2007) [2]_:
 
    .. math::
       \nu \Delta t \left( \frac{1}{\Delta x^2} + \frac{1}{\Delta y^2} \right) \le \frac{1}{2}
@@ -242,4 +242,5 @@ Boundary conditions on the immersed obstacle are enforced as follows:
 References
 ----------
 
-.. [1] Hirsch, C. (2007). *Numerical Computation of Internal and External Flows: The Fundamentals of Computational Fluid Dynamics* (Second Edition). Butterworth-Heinemann.
+.. [1] Barba, L. A., & Forsyth, G. F. (2018). *CFD Python: the 12 steps to Navier-Stokes equations*. Journal of Open Source Education, 1(9), 21. `https://doi.org/10.21105/jose.00021 <https://doi.org/10.21105/jose.00021>`_
+.. [2] Hirsch, C. (2007). *Numerical Computation of Internal and External Flows: The Fundamentals of Computational Fluid Dynamics* (Second Edition). Butterworth-Heinemann.

@@ -8,6 +8,8 @@ Welcome to NAVTILVS
    :width: 90%
    :alt: Cylinder Wake Velocity Field
 
+   *Flow past a circular cylinder (Re = 100): Kármán vortex street resolved with the upwind finite difference scheme.*
+
 Features
 --------
 
@@ -130,11 +132,11 @@ The script ``main.py`` provides a command-line entrypoint to configure, run, and
    * - ``--nx``
      - ``int``
      - *auto*
-     - Number of grid cells along the :math:`x`-direction (defaults to ``128`` for cavity, ``256`` for cylinder).
+     - Number of grid points (nodes) along the :math:`x`-direction (defaults to ``128`` for cavity, ``256`` for cylinder).
    * - ``--ny``
      - ``int``
      - *auto*
-     - Number of grid cells along the :math:`y`-direction (defaults to ``128`` for cavity, ``64`` for cylinder).
+     - Number of grid points (nodes) along the :math:`y`-direction (defaults to ``128`` for cavity, ``64`` for cylinder).
    * - ``--output-dir``
      - ``str``
      - ``imgs``
