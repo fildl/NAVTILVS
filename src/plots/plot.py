@@ -10,6 +10,101 @@ from pathlib import Path
 from ns_solver import Grid
 from ns_solver import centered_diff_x, centered_diff_y
 
+def _compute_vorticity_limits(vorticity: np.ndarray,
+                              vlim: float | tuple[float, float] | None,
+                              clip_percentile: float | None) -> tuple[float, str]:
+    """
+    Compute symmetric bounds [-limit, limit] and colorbar extension for vorticity.
+
+    Parameters
+    ----------
+    vorticity : np.ndarray
+        2D array of vorticity values.
+    vlim : float or tuple of (float, float) or None
+        Explicit scalar limit for symmetric scaling [-vlim, vlim].
+        If a tuple (vmin, vmax) is provided, max(|vmin|, |vmax|) is used.
+    clip_percentile : float or None
+        Percentile threshold for colormap scaling. If None or >= 100, uses max magnitude.
+
+    Returns
+    -------
+    limit : float
+        Positive symmetric bound.
+    extend : str
+        'both' if clipping/saturation occurs, otherwise 'neither'.
+    """
+
+    valid_vort = np.abs(vorticity[~np.isnan(vorticity)])
+    if vlim is not None:
+        if isinstance(vlim, (tuple, list)):
+            limit = float(max(abs(vlim[0]), abs(vlim[1])))
+        else:
+            limit = float(abs(vlim))
+        extend = 'both'
+    elif clip_percentile is not None and clip_percentile < 100.0:
+        limit = float(np.percentile(valid_vort, clip_percentile)) if valid_vort.size > 0 else 1.0
+        extend = 'both'
+    else:
+        limit = float(np.max(valid_vort)) if valid_vort.size > 0 else 1.0
+        extend = 'neither'
+
+    if limit == 0.0:
+        limit = 1.0
+
+    return limit, extend
+
+def _compute_pressure_limits(p: np.ndarray,
+                             vlim: float | tuple[float, float] | None,
+                             clip_percentile: float | None) -> tuple[tuple[float, float], str]:
+    """
+    Compute bounds (p_min, p_max) and colorbar extension for the pressure field.
+
+    Parameters
+    ----------
+    p : np.ndarray
+        2D array of pressure values.
+    vlim : float or tuple of (float, float) or None
+        Explicit limits. If scalar, symmetric [-vlim, vlim]. If tuple, (p_min, p_max).
+    clip_percentile : float or None
+        Percentile threshold. If specified, computes (100 - pct) and pct percentiles.
+
+    Returns
+    -------
+    bounds : tuple[float, float]
+        (p_min, p_max) for the colormap.
+    extend : str
+        'both' if clipping/saturation occurs, otherwise 'neither'.
+    """
+
+    valid_p = p[~np.isnan(p)]
+    if vlim is not None:
+        if isinstance(vlim, (tuple, list)):
+            p_min, p_max = float(vlim[0]), float(vlim[1])
+        else:
+            lim = float(abs(vlim))
+            p_min, p_max = -lim, lim
+        extend = 'both'
+    elif clip_percentile is not None and clip_percentile < 100.0:
+        if valid_p.size > 0:
+            p_min = float(np.percentile(valid_p, 100.0 - clip_percentile))
+            p_max = float(np.percentile(valid_p, clip_percentile))
+            if p_min == p_max:
+                p_min, p_max = p_min - 1.0, p_max + 1.0
+        else:
+            p_min, p_max = -1.0, 1.0
+        extend = 'both'
+    else:
+        if valid_p.size > 0:
+            p_min = float(np.min(valid_p))
+            p_max = float(np.max(valid_p))
+            if p_min == p_max:
+                p_min, p_max = p_min - 1.0, p_max + 1.0
+        else:
+            p_min, p_max = -1.0, 1.0
+        extend = 'neither'
+
+    return (p_min, p_max), extend
+
 def plot_cavity_flow(u: np.ndarray,
                      v: np.ndarray,
                      p: np.ndarray,
@@ -20,6 +115,9 @@ def plot_cavity_flow(u: np.ndarray,
                      reynolds: float = None,
                      quiver_density: int = 20,
                      quiver_scale: float = None,
+                     vlim: float | tuple[float, float] = None,
+                     clip_percentile: float = 98.0,
+                     show_streamlines: bool = True,
                      show_axes: bool = True,
                      save_path: str = None) -> None:
     """
@@ -50,6 +148,14 @@ def plot_cavity_flow(u: np.ndarray,
         Approximate number of arrows per dimension for the quiver plot in 'velocity' mode.
     quiver_scale : float, optional
         Scaling factor for quiver arrow lengths. If None, matplotlib auto-scales.
+    vlim : float or tuple of (float, float), optional
+        Explicit colormap limits for 'vorticity' (scalar symmetric bound) or 'pressure'
+        (scalar symmetric or (vmin, vmax) tuple). If specified, overrides `clip_percentile`.
+    clip_percentile : float, optional, default=98.0
+        Percentile threshold for colormap scaling in 'vorticity' and 'pressure' modes.
+        If set to None or 100.0, uses the unclipped full dynamic range.
+    show_streamlines : bool, default=True
+        Whether to overlay velocity streamlines on the pressure field in 'pressure' mode.
     show_axes : bool, default=True
         Whether to show axis ticks, labels, and title. If False, displays a clean plot frame.
     save_path : str, optional
@@ -98,22 +204,25 @@ def plot_cavity_flow(u: np.ndarray,
                    color='white', pivot='mid', scale=quiver_scale)
 
     elif mode == 'pressure':
-        cf = plt.contourf(X, Y, p, alpha=0.5, cmap='turbo')
-        plt.colorbar(cf, label='Pressure (Pa)', fraction=0.046, pad=0.04)
-        plt.contour(X, Y, p, cmap='turbo')
-        plt.streamplot(X, Y, u, v, density=1.2, color='white')
+        (p_min, p_max), extend_mode = _compute_pressure_limits(p, vlim, clip_percentile)
+        levels = np.linspace(p_min, p_max, 101)
+        p_clipped = np.clip(p, p_min, p_max)
+        cf = plt.contourf(X, Y, p_clipped, levels=levels, alpha=0.5, cmap='turbo')
+        plt.colorbar(cf, label='Pressure (Pa)', fraction=0.046, pad=0.04, extend=extend_mode)
+        plt.contour(X, Y, p_clipped, levels=15, cmap='turbo', linewidths=0.8)
+        if show_streamlines:
+            plt.streamplot(X, Y, u, v, density=1.2, color='white')
 
     elif mode == 'vorticity':
         dv_dx = centered_diff_x(v, grid.dx)
         du_dy = centered_diff_y(u, grid.dy)
         vorticity = np.zeros_like(u)
         vorticity[1:-1, 1:-1] = dv_dx - du_dy
-        limit = max(abs(np.nanmin(vorticity)), abs(np.nanmax(vorticity)))
-        if limit == 0.0:
-            limit = 1.0
+
+        limit, extend_mode = _compute_vorticity_limits(vorticity, vlim, clip_percentile)
         levels = np.linspace(-limit, limit, 101)
-        cf = plt.contourf(X, Y, vorticity, levels=levels, cmap='coolwarm')
-        plt.colorbar(cf, label='Vorticity (rad/s)', fraction=0.046, pad=0.04)
+        cf = plt.contourf(X, Y, np.clip(vorticity, -limit, limit), levels=levels, cmap='coolwarm')
+        plt.colorbar(cf, label='Vorticity (rad/s)', fraction=0.046, pad=0.04, extend=extend_mode)
 
     else:
         raise ValueError(f"Invalid mode '{mode}'. Expected 'velocity', 'pressure', or 'vorticity'.")
@@ -144,6 +253,9 @@ def plot_cylinder_flow(u: np.ndarray,
                        mode: str = 'vorticity',
                        t: float = None,
                        reynolds: float = None,
+                       vlim: float | tuple[float, float] = None,
+                       clip_percentile: float = 98.0,
+                       show_streamlines: bool = True,
                        show_axes: bool = True,
                        save_path: str = None) -> None:
     r"""
@@ -173,6 +285,14 @@ def plot_cylinder_flow(u: np.ndarray,
         Elapsed simulation time in seconds.
     reynolds : float, optional
         Reynolds number of the simulation.
+    vlim : float or tuple of (float, float), optional
+        Explicit colormap limits for 'vorticity' (scalar symmetric bound) or 'pressure'
+        (scalar symmetric or (vmin, vmax) tuple). If specified, overrides `clip_percentile`.
+    clip_percentile : float, optional, default=98.0
+        Percentile threshold for colormap scaling in 'vorticity' and 'pressure' modes.
+        If set to None or 100.0, uses the unclipped full dynamic range.
+    show_streamlines : bool, default=True
+        Whether to overlay velocity streamlines on the pressure field in 'pressure' mode.
     show_axes : bool, default=True
         Whether to show axis ticks, labels, and title. If False, displays a clean plot frame.
     save_path : str, optional
@@ -215,15 +335,10 @@ def plot_cylinder_flow(u: np.ndarray,
         
         # Mask the obstacle region to avoid plotting it
         vorticity[obstacle_mask] = np.nan
-        
-        # Set a symmetric colormap
-        limit = max(abs(np.nanmin(vorticity)), abs(np.nanmax(vorticity)))
-        if limit == 0.0:
-            limit = 1.0
-            
+        limit, extend_mode = _compute_vorticity_limits(vorticity, vlim, clip_percentile)
         levels = np.linspace(-limit, limit, 101)
-        cf = plt.contourf(X, Y, vorticity, levels=levels, cmap='coolwarm')
-        plt.colorbar(cf, label='Vorticity (rad/s)')
+        cf = plt.contourf(X, Y, np.clip(vorticity, -limit, limit), levels=levels, cmap='coolwarm')
+        plt.colorbar(cf, label='Vorticity (rad/s)', extend=extend_mode)
 
     elif mode == 'velocity':
         # Compute velocity magnitude
@@ -242,11 +357,14 @@ def plot_cylinder_flow(u: np.ndarray,
 
         # Mask the obstacle region to avoid plotting it
         p_masked[obstacle_mask] = np.nan
-        
-        cf = plt.contourf(X, Y, p_masked, alpha=0.5, cmap='turbo')
-        plt.colorbar(cf, label='Pressure (Pa)')
-        plt.contour(X, Y, p_masked, cmap='turbo')
-        plt.streamplot(X, Y, u, v, color='white', linewidth=0.8, density=1.5)
+        (p_min, p_max), extend_mode = _compute_pressure_limits(p_masked, vlim, clip_percentile)
+        levels = np.linspace(p_min, p_max, 101)
+        p_clipped = np.clip(p_masked, p_min, p_max)
+        cf = plt.contourf(X, Y, p_clipped, levels=levels, alpha=0.5, cmap='turbo')
+        plt.colorbar(cf, label='Pressure (Pa)', extend=extend_mode)
+        plt.contour(X, Y, p_clipped, levels=15, cmap='turbo', linewidths=0.8)
+        if show_streamlines:
+            plt.streamplot(X, Y, u, v, color='white', linewidth=0.8, density=1.5)
 
     else:
         raise ValueError(f"Invalid mode '{mode}'. Expected 'vorticity', 'velocity', or 'pressure'.")
