@@ -148,7 +148,15 @@ The script ``main.py`` provides a command-line entrypoint to configure, run, and
    * - ``--output-dir``
      - ``str``
      - ``imgs``
-     - Directory path where generated diagnostic figures will be stored.
+     - Directory path where generated diagnostic figures and checkpoints will be stored.
+   * - ``--save-data``
+     - flag
+     - ``False``
+     - If set, exports the final solved fields (:math:`u, v, p`), grid coordinates, and physical metadata to a compressed NumPy archive (``{output_dir}/{sim}_fields.npz``).
+   * - ``--save-interval``
+     - ``float``
+     - *None*
+     - If set, periodically saves intermediate field every given physical seconds to ``{output_dir}/checkpoints/fields_XXXX_t*.npz``.
 
 **CLI Usage Examples**:
 
@@ -185,6 +193,20 @@ The script ``main.py`` provides a command-line entrypoint to configure, run, and
    .. code-block:: bash
 
       python main.py --sim cylinder --re 150.0 --nx 512 --ny 128 --tend 5.0 --output-dir results/
+
+4. **Saving Simulation Data & Checkpointing**:
+
+   Save the final fluid fields (:math:`u, v, p`) directly to an ``.npz`` archive:
+
+   .. code-block:: bash
+
+      python main.py --sim cavity --re 100.0 --tend 2.5 --save-data
+
+   Save solved field every 0.05 seconds of physical time:
+
+   .. code-block:: bash
+
+      python main.py --sim cylinder --re 100.0 --tend 3.5 --save-interval 0.05
 
 Python API
 ^^^^^^^^^^
@@ -243,6 +265,46 @@ Or from Python:
    plot_cylinder_flow(u, v, p, grid, sim.obstacle_mask, mode='vorticity',
                       t=sim.t, reynolds=sim.reynolds_number,
                       save_path="imgs/cylinder_vorticity.png")
+
+3. Saving & Loading Simulation Fields (.npz)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+NAVTILVS provides support for saving and loading simulation states using compressed NumPy archives (``.npz``).
+
+**Periodic Checkpointing During Solve**:
+
+Pass ``save_interval`` (in seconds of physical time) and optional ``save_dir`` to :meth:`~ns_solver.simulation.SimulationClass.solve`:
+
+.. code-block:: python
+
+   from ns_solver import Grid, CylinderSimulation, load_fields
+
+   grid = Grid(lx=2.0, ly=0.5, nx=256, ny=64)
+   sim = CylinderSimulation(grid=grid, rho=1.0, nu=0.001)
+
+   # Solves and automatically saves initial state (t=0), periodic snapshots every 0.05s, and final state
+   sim.solve(t_end=2.0, save_interval=0.05, save_dir="checkpoints")
+
+**Manual Field Saving & Inspection**:
+
+You can also export fields at any step using :meth:`~ns_solver.simulation.SimulationClass.save_fields`:
+
+.. code-block:: python
+
+   # Save current state manually to an .npz archive
+   sim.save_fields("my_snapshot.npz")
+
+   # Load fields back into memory
+   data = load_fields("my_snapshot.npz")
+
+   u = data["u"]                # 2D array of horizontal velocity (ny, nx)
+   v = data["v"]                # 2D array of vertical velocity (ny, nx)
+   p = data["p"]                # 2D array of pressure field (ny, nx)
+   x = data["x"]                # 1D array of x coordinates
+   y = data["y"]                # 1D array of y coordinates
+   mask = data["obstacle_mask"] # 2D boolean obstacle mask (or None)
+   t_sim = data["t"]            # Simulated physical time in seconds
+   re = data["reynolds"]        # Reynolds number (or None)
 
 Simulation Gallery
 ------------------

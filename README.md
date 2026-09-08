@@ -99,6 +99,12 @@ python main.py --sim cylinder
 
 # Custom parameters (resolution, Reynolds, duration, output directory)
 python main.py --sim cavity --re 200 --nx 256 --ny 256 --tend 5.0 --output-dir imgs
+
+# Save final solved fields to compressed .npz archive
+python main.py --sim cavity --save-data
+
+# Save solved field every 0.05 seconds of physical time
+python main.py --sim cylinder --tend 3.5 --save-interval 0.05
 ```
 
 All plots (velocity, pressure with streamlines, and vorticity) are automatically exported to the target directory (`imgs/` by default).
@@ -108,19 +114,23 @@ All plots (velocity, pressure with streamlines, and vorticity) are automatically
 Simulations can also be imported and configured directly within Python scripts:
 
 ```python
-from ns_solver import Grid, CavitySimulation
+from ns_solver import Grid, CavitySimulation, load_fields
 from plots import plot_cavity_flow
 
 # Initialize grid and solver
 grid = Grid(lx=1.0, ly=1.0, nx=128, ny=128)
 sim = CavitySimulation(grid=grid, rho=1.0, nu=0.01, dt=0.001)
 
-# Solve Navier-Stokes equations
-u, v, p = sim.solve(t_end=2.5)
+# Solve Navier-Stokes equations with periodic checkpointing
+u, v, p = sim.solve(t_end=2.5, save_interval=0.1, save_dir="checkpoints")
 
 # Visualize and save results
 plot_cavity_flow(u, v, p, grid, mode="velocity", t=sim.t,
                  reynolds=sim.reynolds_number, save_path="imgs/cavity_velocity.png")
+
+# Load saved fields offline
+data = load_fields("checkpoints/fields_0005_t0.500.npz")
+u_saved, p_saved = data["u"], data["p"]
 ```
 
 ## Testing
