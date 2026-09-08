@@ -2,8 +2,6 @@ import numpy as np
 from ns_solver import Grid
 from ns_solver import CavitySimulation
 
-TOLERANCE = 5e-5
-
 def test_cavity_boundary_conditions():
     """
     Test if boundary conditions are applied correctly for the CavitySimulation.
