@@ -177,7 +177,10 @@ def plot_cavity_flow(u: np.ndarray,
         'pressure': 'Streamlines & Pressure Field',
         'vorticity': 'Vorticity Field'
     }
-    field_name = mode_titles.get(mode, 'Flow Field')
+    if mode not in mode_titles:
+        raise ValueError(f"Invalid mode '{mode}'. Expected 'velocity', 'pressure', or 'vorticity'.")
+
+    field_name = mode_titles[mode]
     title_str = f"Lid-Driven Cavity - {field_name}"
     if reynolds is not None:
         title_str += f" ($Re = {reynolds:.0f}$"
@@ -223,9 +226,6 @@ def plot_cavity_flow(u: np.ndarray,
         levels = np.linspace(-limit, limit, 101)
         cf = plt.contourf(X, Y, np.clip(vorticity, -limit, limit), levels=levels, cmap='coolwarm')
         plt.colorbar(cf, label='Vorticity (rad/s)', fraction=0.046, pad=0.04, extend=extend_mode)
-
-    else:
-        raise ValueError(f"Invalid mode '{mode}'. Expected 'velocity', 'pressure', or 'vorticity'.")
 
     plt.xlim(0, grid.lx)
     plt.ylim(0, grid.ly)
@@ -311,7 +311,10 @@ def plot_cylinder_flow(u: np.ndarray,
         'velocity': 'Velocity Field',
         'pressure': 'Streamlines & Pressure Field'
     }
-    field_name = mode_titles.get(mode, 'Flow Field')
+    if mode not in mode_titles:
+        raise ValueError(f"Invalid mode '{mode}'. Expected 'vorticity', 'velocity', or 'pressure'.")
+
+    field_name = mode_titles[mode]
     title_str = f"Cylinder Flow - {field_name}"
     if reynolds is not None:
         title_str += f" ($Re = {reynolds:.1f}$"
@@ -365,9 +368,6 @@ def plot_cylinder_flow(u: np.ndarray,
         plt.contour(X, Y, p_clipped, levels=15, cmap='turbo', linewidths=0.8)
         if show_streamlines:
             plt.streamplot(X, Y, u, v, color='white', linewidth=0.8, density=1.5)
-
-    else:
-        raise ValueError(f"Invalid mode '{mode}'. Expected 'vorticity', 'velocity', or 'pressure'.")
 
     # Fill the obstacle region
     plt.contourf(X, Y, obstacle_mask.astype(float), levels=[0.5, 1.5], colors=['#333333'])

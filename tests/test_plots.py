@@ -1,5 +1,12 @@
+import pytest
 import numpy as np
-from plots.plot import _compute_vorticity_limits, _compute_pressure_limits
+from ns_solver import Grid
+from plots.plot import (
+    _compute_vorticity_limits,
+    _compute_pressure_limits,
+    plot_cavity_flow,
+    plot_cylinder_flow
+)
 
 TOLERANCE = 1e-5
 
@@ -68,6 +75,19 @@ def test_compute_vorticity_limits_all_zeros():
 
     limit, extend = _compute_vorticity_limits(vort, vlim=None, clip_percentile=98.0)
     assert limit == 1.0
+
+def test_plot_cavity_flow_invalid_mode():
+    """
+    Validate that plot_cavity_flow raises ValueError when passed an unsupported mode.
+    """
+    
+    grid = Grid(lx=1.0, ly=1.0, nx=10, ny=10)
+    u = np.zeros((10, 10))
+    v = np.zeros((10, 10))
+    p = np.zeros((10, 10))
+
+    with pytest.raises(ValueError, match="Invalid mode"):
+        plot_cavity_flow(u, v, p, grid, mode='invalid')
 
 # ==========================================
 # _compute_pressure_limits
@@ -139,3 +159,17 @@ def test_compute_pressure_limits_constant_field():
 
     bounds, extend = _compute_pressure_limits(p, vlim=None, clip_percentile=None)
     assert bounds == (4.0, 6.0)
+
+def test_plot_cylinder_flow_invalid_mode():
+    """
+    Validate that plot_cylinder_flow raises ValueError when passed an unsupported mode.
+    """
+    grid = Grid(lx=2.0, ly=1.0, nx=20, ny=10)
+    u = np.zeros((10, 20))
+    v = np.zeros((10, 20))
+    p = np.zeros((10, 20))
+    obstacle = np.zeros((10, 20), dtype=bool)
+
+    with pytest.raises(ValueError, match="Invalid mode"):
+        plot_cylinder_flow(u, v, p, grid, obstacle, mode='invalid')
+
