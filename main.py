@@ -11,7 +11,12 @@ __email__ = ['filippo.diludovico@studio.unibo.it']
 import argparse
 from pathlib import Path
 from ns_solver import Grid, CavitySimulation, CylinderSimulation
-from plots import plot_cavity_flow, plot_cylinder_flow
+from plots import (
+    plot_cavity_flow,
+    plot_cylinder_flow,
+    plot_saved_fields,
+    plot_checkpoint_series,
+)
 
 def run_cavity(reynolds: float = 100.0,
                nx: int = 128,
@@ -174,6 +179,61 @@ def run_cylinder(reynolds: float = 100.0,
 
     print(f"\nAll cylinder plots saved successfully to '{output_dir}/'!")
 
+def run_postprocess_file(filepath: str,
+                         output_dir: str = None) -> None:
+    """
+    Generate flow field plots from a single saved .npz archive.
+
+    Parameters
+    ----------
+    filepath : str
+        Path to the saved .npz archive file.
+    output_dir : str, optional
+        Directory where generated plots will be saved. Defaults to source file directory.
+    """
+
+    print("=" * 65)
+    print(" NAVTILVS - Post-Processing Single File")
+    print(f" Source File: {filepath}")
+    if output_dir is not None:
+        print(f" Target Directory: {output_dir}")
+    print("=" * 65)
+
+    saved_plots = plot_saved_fields(filepath=filepath, output_dir=output_dir)
+    print("Plots generated successfully:")
+    for p in saved_plots:
+        print(f"  -> {p}")
+    print()
+
+def run_postprocess_checkpoints(checkpoint_dir: str,
+                                output_dir: str = None,
+                                step: int = 1) -> None:
+    """
+    Generate flow field plots for all .npz checkpoints in a directory.
+
+    Parameters
+    ----------
+    checkpoint_dir : str
+        Directory containing .npz checkpoints.
+    output_dir : str, optional
+        Target directory for saved plot images. Defaults to 'checkpoint_dir/plots'.
+    step : int, default=1
+        Sampling stride.
+    """
+
+    print("=" * 65)
+    print(" NAVTILVS - Post-Processing Checkpoints Batch Mode")
+    print(f" Checkpoint Directory: {checkpoint_dir}")
+    print(f" Sampling Stride (step): {step}")
+    if output_dir is not None:
+        print(f" Target Directory: {output_dir}")
+    print("=" * 65)
+
+    saved_plots = plot_checkpoint_series(checkpoint_dir=checkpoint_dir,
+                                         output_dir=output_dir,
+                                         step=step)
+    print(f"Batch plotting completed! Total figures generated: {len(saved_plots)}\n")
+
 def parse_args():
     """
     Parse command-line interface arguments for NAVTILVS simulations.
@@ -221,8 +281,8 @@ def parse_args():
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="imgs",
-        help="Directory where output plots will be saved (default: imgs)",
+        default=None,
+        help="Directory where output plots will be saved (default: imgs for simulations)",
     )
     parser.add_argument(
         "--save-data",
@@ -236,21 +296,54 @@ def parse_args():
         default=None,
         help="Physical time interval in seconds for saving intermediate field snapshots (default: None)",
     )
+    parser.add_argument(
+        "--plot-data",
+        type=str,
+        default=None,
+        help="Post-processing: generate plots from a single saved .npz field archive",
+    )
+    parser.add_argument(
+        "--plot-checkpoints",
+        type=str,
+        default=None,
+        help="Post-processing: generate plots for all .npz checkpoints in a directory",
+    )
+    parser.add_argument(
+        "--step",
+        type=int,
+        default=1,
+        help="Sampling stride for checkpoint batch plotting (default: 1)",
+    )
     return parser.parse_args()
 
 def main():
     """
-    CLI entry point: parse arguments and execute the selected fluid simulation.
+    CLI entry point: parse arguments and execute the selected fluid simulation or post-processing.
     """
     
     args = parse_args()
+
+    # Post-processing: single .npz file
+    if args.plot_data is not None:
+        run_postprocess_file(filepath=args.plot_data, output_dir=args.output_dir)
+        return
+
+    # Post-processing: checkpoints directory
+    if args.plot_checkpoints is not None:
+        run_postprocess_checkpoints(checkpoint_dir=args.plot_checkpoints,
+                                    output_dir=args.output_dir,
+                                    step=args.step)
+        return
+
+    # Standard simulation execution
+    out_dir = args.output_dir if args.output_dir is not None else "imgs"
 
     if args.sim == "cavity":
         nx = args.nx if args.nx is not None else 128
         ny = args.ny if args.ny is not None else 128
         t_end = args.tend if args.tend is not None else 2.5
         run_cavity(reynolds=args.re, nx=nx, ny=ny, t_end=t_end,
-                   output_dir=args.output_dir,
+                   output_dir=out_dir,
                    save_data=args.save_data,
                    save_interval=args.save_interval)
 
@@ -259,9 +352,9 @@ def main():
         ny = args.ny if args.ny is not None else 64
         t_end = args.tend if args.tend is not None else 3.5
         run_cylinder(reynolds=args.re, nx=nx, ny=ny, t_end=t_end,
-                     output_dir=args.output_dir,
-                     save_data=args.save_data,
-                     save_interval=args.save_interval)
+                   output_dir=out_dir,
+                   save_data=args.save_data,
+                   save_interval=args.save_interval)
 
 if __name__ == "__main__":
     main()

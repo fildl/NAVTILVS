@@ -156,7 +156,19 @@ The script ``main.py`` provides a command-line entrypoint to configure, run, and
    * - ``--save-interval``
      - ``float``
      - *None*
-     - If set, periodically saves intermediate field every given physical seconds to ``{output_dir}/checkpoints/fields_XXXX_t*.npz``.
+     - If set, periodically saves intermediate field checkpoints every given physical seconds to ``{output_dir}/checkpoints/fields_XXXX_t*.npz``.
+   * - ``--plot-data``
+     - ``str``
+     - *None*
+     - Post-processing: path to a saved ``.npz`` field archive to generate plots from.
+   * - ``--plot-checkpoints``
+     - ``str``
+     - *None*
+     - Post-processing: directory containing ``.npz`` checkpoints to plot in batch mode.
+   * - ``--step``
+     - ``int``
+     - ``1``
+     - Stride/sampling rate for batch plotting checkpoints (e.g. ``2`` plots every second checkpoint).
 
 **CLI Usage Examples**:
 
@@ -202,11 +214,25 @@ The script ``main.py`` provides a command-line entrypoint to configure, run, and
 
       python main.py --sim cavity --re 100.0 --tend 2.5 --save-data
 
-   Save solved field every 0.05 seconds of physical time:
+   Save checkpoints every 0.05 seconds of physical time:
 
    .. code-block:: bash
 
-      python main.py --sim cylinder --re 100.0 --tend 3.5 --save-interval 0.05
+      python main.py --sim cylinder --re 100.0 --tend 3.5 --save-interval 0.05 --output-dir imgs/cylinder_run
+
+5. **Post-Processing & Offline Plotting**:
+
+   Generate plots from an existing saved file without rerunning the solver:
+
+   .. code-block:: bash
+
+      python main.py --plot-data imgs/cavity_fields.npz --output-dir imgs/post_plots
+
+   Batch-plot all checkpoints in a folder, sampling one every 2 checkpoints:
+
+   .. code-block:: bash
+
+      python main.py --plot-checkpoints imgs/cylinder_run/checkpoints/ --step 2
 
 Python API
 ^^^^^^^^^^
@@ -305,6 +331,21 @@ You can also export fields at any step using :meth:`~ns_solver.simulation.Simula
    mask = data["obstacle_mask"] # 2D boolean obstacle mask (or None)
    t_sim = data["t"]            # Simulated physical time in seconds
    re = data["reynolds"]        # Reynolds number (or None)
+
+4. Offline Post-Processing & Batch Plotting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Saved simulation snapshots can be rendered into high-resolution diagnostic figures anytime without running the numerical solver:
+
+.. code-block:: python
+
+   from plots import plot_saved_fields, plot_checkpoint_series
+
+   # Plot fields from a single saved archive
+   plot_saved_fields("cavity_fields.npz", output_dir="plots/")
+
+   # Batch plot all checkpoints in a folder, sampling every 2 checkpoints
+   plot_checkpoint_series("checkpoints/", output_dir="checkpoints/plots/", step=2)
 
 Simulation Gallery
 ------------------

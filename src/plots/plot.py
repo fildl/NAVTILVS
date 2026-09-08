@@ -7,7 +7,7 @@ __email__ = ['filippo.diludovico@studio.unibo.it']
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
-from ns_solver import Grid
+from ns_solver import Grid, load_fields
 from ns_solver import centered_diff_x, centered_diff_y
 
 def _compute_vorticity_limits(vorticity: np.ndarray,
@@ -244,6 +244,7 @@ def plot_cavity_flow(u: np.ndarray,
         path = Path(save_path)
         path.parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(path, dpi=300, bbox_inches='tight')
+        plt.close()
 
 def plot_cylinder_flow(u: np.ndarray,
                        v: np.ndarray,
@@ -389,3 +390,184 @@ def plot_cylinder_flow(u: np.ndarray,
         path = Path(save_path)
         path.parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(path, dpi=300, bbox_inches='tight')
+        plt.close()
+
+def plot_saved_fields(filepath: str | Path,
+                      output_dir: str | Path = None,
+                      modes: tuple[str, ...] = ('velocity', 'pressure', 'vorticity'),
+                      sim_type: str = None,
+                      vlim: float | tuple[float, float] = None,
+                      clip_percentile: float = 98.0,
+                      show_streamlines: bool = True,
+                      show_axes: bool = True) -> list[Path]:
+    """
+    Plot fluid dynamic fields from a saved compressed NumPy (.npz) archive.
+
+    Parameters
+    ----------
+    filepath : str or Path
+        Path to the .npz archive containing simulation fields.
+    output_dir : str or Path, optional
+        Directory where generated plot images will be saved.
+        If None, plots are saved in the same directory as the source file.
+    modes : tuple of str, default=('velocity', 'pressure', 'vorticity')
+        Field modes to plot. Supported values are 'velocity', 'pressure', 'vorticity'.
+    sim_type : {'cavity', 'cylinder'}, optional
+        Simulation benchmark type. If None, automatically detected from
+        the presence of an obstacle mask in the loaded data.
+    vlim : float or tuple of (float, float), optional
+        Explicit colormap limits for 'vorticity' or 'pressure'.
+    clip_percentile : float, optional, default=98.0
+        Percentile threshold for colormap scaling in 'vorticity' and 'pressure' modes.
+    show_streamlines : bool, default=True
+        Whether to overlay streamlines in 'pressure' mode.
+    show_axes : bool, default=True
+        Whether to show axis ticks, labels, and title.
+
+    Returns
+    -------
+    list of Path
+        List of paths to the saved plot image files.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the specified file does not exist.
+    ValueError
+        If an invalid mode or sim_type is specified.
+    """
+
+    path = Path(filepath)
+    data = load_fields(path)
+
+    grid = Grid(lx=data["lx"], ly=data["ly"], nx=data["nx"], ny=data["ny"])
+
+    obstacle_mask = data.get("obstacle_mask")
+    has_obstacle = obstacle_mask is not None and np.any(obstacle_mask)
+
+    if sim_type is None:
+        sim_type = "cylinder" if has_obstacle else "cavity"
+    elif sim_type not in ("cavity", "cylinder"):
+        raise ValueError(f"Invalid sim_type '{sim_type}'. Expected 'cavity' or 'cylinder'.")
+
+    out = Path(output_dir) if output_dir is not None else path.parent
+    out.mkdir(parents=True, exist_ok=True)
+
+    stem = path.stem
+    saved_paths: list[Path] = []
+
+    for mode in modes:
+        save_file = out / f"{stem}_{mode}.png"
+        if sim_type == "cylinder":
+            mask = obstacle_mask if obstacle_mask is not None else np.zeros((grid.ny, grid.nx), dtype=bool)
+            plot_cylinder_flow(
+                u=data["u"],
+                v=data["v"],
+                p=data["p"],
+                grid=grid,
+                obstacle_mask=mask,
+                mode=mode,
+                t=data.get("t"),
+                reynolds=data.get("reynolds"),
+                vlim=vlim,
+                clip_percentile=clip_percentile,
+                show_streamlines=show_streamlines,
+                show_axes=show_axes,
+                save_path=str(save_file)
+            )
+        else:
+            plot_cavity_flow(
+                u=data["u"],
+                v=data["v"],
+                p=data["p"],
+                grid=grid,
+                mode=mode,
+                nu=data.get("nu"),
+                t=data.get("t"),
+                reynolds=data.get("reynolds"),
+                vlim=vlim,
+                clip_percentile=clip_percentile,
+                show_streamlines=show_streamlines,
+                show_axes=show_axes,
+                save_path=str(save_file)
+            )
+        saved_paths.append(save_file)
+
+    return saved_paths
+
+def plot_checkpoint_series(checkpoint_dir: str | Path,
+                           output_dir: str | Path = None,
+                           modes: tuple[str, ...] = ('velocity', 'pressure', 'vorticity'),
+                           sim_type: str = None,
+                           step: int = 1,
+                           vlim: float | tuple[float, float] = None,
+                           clip_percentile: float = 98.0,
+                           show_streamlines: bool = True,
+                           show_axes: bool = True) -> list[Path]:
+    """
+    Plot fluid dynamic fields from a directory of simulation checkpoints.
+
+    Parameters
+    ----------
+    checkpoint_dir : str or Path
+        Directory containing .npz checkpoint files.
+    output_dir : str or Path, optional
+        Target directory for saved plot images. Defaults to ``checkpoint_dir / "plots"``.
+    modes : tuple of str, default=('velocity', 'pressure', 'vorticity')
+        Field modes to plot for each checkpoint.
+    sim_type : {'cavity', 'cylinder'}, optional
+        Simulation benchmark type. Auto-detected if None.
+    step : int, default=1
+        Sampling stride (e.g. step=2 plots every second checkpoint).
+    vlim : float or tuple of (float, float), optional
+        Explicit colormap limits.
+    clip_percentile : float, optional, default=98.0
+        Percentile threshold for colormap scaling in 'vorticity' and 'pressure' modes.
+    show_streamlines : bool, default=True
+        Whether to overlay streamlines in 'pressure' mode.
+    show_axes : bool, default=True
+        Whether to show axis ticks, labels, and title.
+
+    Returns
+    -------
+    list of Path
+        List of all generated plot image file paths.
+
+    Raises
+    ------
+    FileNotFoundError
+        If checkpoint_dir does not exist or contains no .npz files.
+    ValueError
+        If step < 1.
+    """
+
+    chk_dir = Path(checkpoint_dir)
+    if not chk_dir.is_dir():
+        raise FileNotFoundError(f"Checkpoint directory not found: '{checkpoint_dir}'")
+
+    if step < 1:
+        raise ValueError(f"Step must be a positive integer >= 1, got {step}.")
+
+    files = sorted(chk_dir.glob("*.npz"))
+    if not files:
+        raise FileNotFoundError(f"No .npz checkpoint files found in '{checkpoint_dir}'")
+
+    selected_files = files[::step]
+    out = Path(output_dir) if output_dir is not None else chk_dir / "plots"
+    out.mkdir(parents=True, exist_ok=True)
+
+    all_saved: list[Path] = []
+    for f in selected_files:
+        plots = plot_saved_fields(
+            filepath=f,
+            output_dir=out,
+            modes=modes,
+            sim_type=sim_type,
+            vlim=vlim,
+            clip_percentile=clip_percentile,
+            show_streamlines=show_streamlines,
+            show_axes=show_axes
+        )
+        all_saved.extend(plots)
+
+    return all_saved

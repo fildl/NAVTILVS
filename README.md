@@ -104,7 +104,13 @@ python main.py --sim cavity --re 200 --nx 256 --ny 256 --tend 5.0 --output-dir i
 python main.py --sim cavity --save-data
 
 # Save solved field every 0.05 seconds of physical time
-python main.py --sim cylinder --tend 3.5 --save-interval 0.05
+python main.py --sim cylinder --tend 3.5 --save-interval 0.05 --output-dir imgs/cylinder_run
+
+# Offline post-processing: plot a saved .npz archive without rerunning solver
+python main.py --plot-data imgs/cavity_fields.npz --output-dir imgs/post_plots
+
+# Offline post-processing: batch plot checkpoints in a folder
+python main.py --plot-checkpoints imgs/cylinder_run/checkpoints/ --step 2
 ```
 
 All plots (velocity, pressure with streamlines, and vorticity) are automatically exported to the target directory (`imgs/` by default).
@@ -115,7 +121,7 @@ Simulations can also be imported and configured directly within Python scripts:
 
 ```python
 from ns_solver import Grid, CavitySimulation, load_fields
-from plots import plot_cavity_flow
+from plots import plot_cavity_flow, plot_saved_fields, plot_checkpoint_series
 
 # Initialize grid and solver
 grid = Grid(lx=1.0, ly=1.0, nx=128, ny=128)
@@ -128,9 +134,12 @@ u, v, p = sim.solve(t_end=2.5, save_interval=0.1, save_dir="checkpoints")
 plot_cavity_flow(u, v, p, grid, mode="velocity", t=sim.t,
                  reynolds=sim.reynolds_number, save_path="imgs/cavity_velocity.png")
 
-# Load saved fields offline
+# Load and inspect saved fields offline
 data = load_fields("checkpoints/fields_0005_t0.500.npz")
 u_saved, p_saved = data["u"], data["p"]
+
+# Offline batch plotting of saved checkpoints
+plot_checkpoint_series("checkpoints/", output_dir="checkpoints/plots/", step=2)
 ```
 
 ## Testing
