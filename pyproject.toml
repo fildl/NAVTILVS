@@ -52,7 +52,6 @@ dev = [
 ]
 docs = [
     "sphinx>=7.0.0",
-    "numpydoc",
 ]
 
 [project.urls]
