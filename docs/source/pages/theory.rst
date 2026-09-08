@@ -63,6 +63,20 @@ where the source term :math:`b` is defined by:
 
 The second term on the right-hand side represents compressibility/divergence correction, preventing the numerical accumulation of dilatation errors over time.
 
+Point-Jacobi Relaxation and Convergence Criteria
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The discrete Poisson equation is solved at each time step using a five-point **Point-Jacobi relaxation**:
+
+.. math::
+   p_{i,j}^{(k+1)} = \frac{(p_{i+1,j}^{(k)} + p_{i-1,j}^{(k)})\Delta y^2 + (p_{i,j+1}^{(k)} + p_{i,j-1}^{(k)})\Delta x^2 - b_{i,j} \Delta x^2 \Delta y^2}{2(\Delta x^2 + \Delta y^2)}
+
+For computational efficiency, the scaled source term :math:`b_{i,j} \frac{\Delta x^2 \Delta y^2}{2(\Delta x^2 + \Delta y^2)}` is precomputed outside the iteration loop.
+Iterations run up to a maximum limit (``p_max_iter``, default 500) or terminate early if the maximum field change between consecutive iterations drops below an optional convergence tolerance (``p_tol``):
+
+.. math::
+   \max_{i,j} \left| p_{i,j}^{(k+1)} - p_{i,j}^{(k)} \right| < \text{tol}
+
 .. _convective_upwind:
 
 Convective Discretization: The Upwind Scheme
