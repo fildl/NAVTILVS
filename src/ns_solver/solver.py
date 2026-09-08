@@ -97,8 +97,9 @@ def pressure_poisson(p : np.ndarray,
     const_y = dx**2 / denom
     const_b = dx**2 * dy**2 / denom
 
-    # Pre-allocate array for pressure field
+    # Pre-allocate array for pressure field and precompute source term
     pn = np.empty_like(p)
+    b_term = b[1:-1, 1:-1] * const_b
 
     for _ in range(max_iter):
 
@@ -107,7 +108,7 @@ def pressure_poisson(p : np.ndarray,
 
         p[1:-1, 1:-1] = ((pn[1:-1, 2:] + pn[1:-1, 0:-2]) * const_x +
                          (pn[2:, 1:-1] + pn[0:-2, 1:-1]) * const_y -
-                         b[1:-1,1:-1] * const_b)
+                         b_term)
 
         # Apply boundary conditions
         p = boundary_conditions(p)
