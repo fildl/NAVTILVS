@@ -176,15 +176,17 @@ The script ``main.py`` provides a command-line entrypoint to configure, run, and
 
    Generated files in ``imgs/``:
 
-   * ``cylinder_vorticity.png``: Vorticity field with symmetric 'coolwarm' colormap, resolving alternating Kármán vortex street shedding.
-   * ``cylinder_velocity.png``: Velocity magnitude field ('turbo' colormap) overlaid with streamlines and recirculation bubbles.
-   * ``cylinder_pressure.png``: Velocity streamlines overlaid on pressure contour field ('turbo' colormap) and masked cylinder obstacle.
+   * ``cylinder_velocity.png``: Velocity magnitude field ('turbo' colormap) overlaid with velocity streamlines.
+   * ``cylinder_pressure.png``: Velocity streamlines overlaid on pressure contour field ('turbo' colormap).
+   * ``cylinder_vorticity.png``: Vorticity field with symmetric 'coolwarm' colormap highlighting alternating Kármán vortex shedding.
 
-3. **Custom Resolution & High Reynolds Number**:
+**Custom Parameters & Options**:
 
-   .. code-block:: bash
+You can override default parameters (resolution, Reynolds number, simulation duration, and output directory) for any simulation:
 
-      python main.py --sim cylinder --re 150.0 --nx 512 --ny 128 --tend 5.0 --output-dir results/
+.. code-block:: bash
+
+   python main.py --sim cylinder --re 150.0 --nx 512 --ny 128 --tend 5.0 --output-dir results/
 
 Python API
 ^^^^^^^^^^

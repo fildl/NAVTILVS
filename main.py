@@ -125,9 +125,9 @@ def run_cylinder(reynolds: float = 100.0,
 
     # Generate all three diagnostic plots
     modes = [
-        ('vorticity', 'cylinder_vorticity.png'),
         ('velocity', 'cylinder_velocity.png'),
         ('pressure', 'cylinder_pressure.png'),
+        ('vorticity', 'cylinder_vorticity.png'),
     ]
 
     for mode, filename in modes:
