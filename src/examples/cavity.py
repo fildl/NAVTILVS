@@ -34,11 +34,11 @@ plot_cavity_flow(u=u, v=v, p=p,
 # 2. Plot Streamlines & Pressure Field
 plot_cavity_flow(u=u, v=v, p=p,
                  grid=grid,
-                 mode='stream',
+                 mode='pressure',
                  nu=NU,
                  t=simulation.t,
                  reynolds=simulation.reynolds_number,
-                 save_path="imgs/cavity_flow.png")
+                 save_path="imgs/cavity_pressure.png")
 
 # 3. Plot Vorticity Field
 plot_cavity_flow(u=u, v=v, p=p,
@@ -47,11 +47,3 @@ plot_cavity_flow(u=u, v=v, p=p,
                  t=simulation.t,
                  reynolds=simulation.reynolds_number,
                  save_path="imgs/cavity_vorticity.png")
-
-# 4. Plot Pressure Field
-plot_cavity_flow(u=u, v=v, p=p,
-                 grid=grid,
-                 mode='pressure',
-                 t=simulation.t,
-                 reynolds=simulation.reynolds_number,
-                 save_path="imgs/cavity_pressure.png")

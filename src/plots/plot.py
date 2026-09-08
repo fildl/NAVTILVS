@@ -38,9 +38,8 @@ def plot_cavity_flow(u: np.ndarray,
     mode : str, default='velocity'
         Visualization mode:
         - 'velocity': Velocity magnitude field with 'turbo' colormap and directional quiver vectors.
-        - 'stream': Velocity streamlines overlaid on pressure contour field ('turbo' colormap).
+        - 'pressure': Velocity streamlines overlaid on pressure contour field ('turbo' colormap).
         - 'vorticity': Vorticity field with symmetric 'coolwarm' colormap.
-        - 'pressure': Pressure field with 'coolwarm' colormap.
     nu : float, optional
         Kinematic viscosity.
     t : float, optional
@@ -69,9 +68,8 @@ def plot_cavity_flow(u: np.ndarray,
 
     mode_titles = {
         'velocity': 'Velocity Field',
-        'stream': 'Streamlines & Pressure Field',
-        'vorticity': 'Vorticity Field',
-        'pressure': 'Pressure Field'
+        'pressure': 'Streamlines & Pressure Field',
+        'vorticity': 'Vorticity Field'
     }
     field_name = mode_titles.get(mode, 'Flow Field')
     title_str = f"Lid-Driven Cavity - {field_name}"
@@ -99,7 +97,7 @@ def plot_cavity_flow(u: np.ndarray,
                    u[::step_y, ::step_x], v[::step_y, ::step_x],
                    color='white', pivot='mid', scale=quiver_scale)
 
-    elif mode == 'stream':
+    elif mode == 'pressure':
         cf = plt.contourf(X, Y, p, alpha=0.5, cmap='turbo')
         plt.colorbar(cf, label='Pressure (Pa)', fraction=0.046, pad=0.04)
         plt.contour(X, Y, p, cmap='turbo')
@@ -117,12 +115,8 @@ def plot_cavity_flow(u: np.ndarray,
         cf = plt.contourf(X, Y, vorticity, levels=levels, cmap='coolwarm')
         plt.colorbar(cf, label='Vorticity (rad/s)', fraction=0.046, pad=0.04)
 
-    elif mode == 'pressure':
-        cf = plt.contourf(X, Y, p, levels=100, cmap='coolwarm')
-        plt.colorbar(cf, label='Pressure (Pa)', fraction=0.046, pad=0.04)
-
     else:
-        raise ValueError(f"Invalid mode '{mode}'. Expected 'velocity', 'stream', 'vorticity', or 'pressure'.")
+        raise ValueError(f"Invalid mode '{mode}'. Expected 'velocity', 'pressure', or 'vorticity'.")
 
     plt.xlim(0, grid.lx)
     plt.ylim(0, grid.ly)
@@ -174,7 +168,7 @@ def plot_cylinder_flow(u: np.ndarray,
         Visualization mode:
         - 'vorticity': Vorticity field with symmetric 'coolwarm' colormap and masked cylinder obstacle.
         - 'velocity': Velocity magnitude field with 'turbo' colormap, overlaid with velocity streamlines and masked cylinder obstacle.
-        - 'pressure': Pressure field with 'coolwarm' colormap and masked cylinder obstacle.
+        - 'pressure': Velocity streamlines overlaid on pressure contour field ('turbo' colormap) and masked cylinder obstacle.
     t : float, optional
         Elapsed simulation time in seconds.
     reynolds : float, optional
@@ -195,7 +189,7 @@ def plot_cylinder_flow(u: np.ndarray,
     mode_titles = {
         'vorticity': 'Vorticity Field',
         'velocity': 'Velocity Field',
-        'pressure': 'Pressure Field'
+        'pressure': 'Streamlines & Pressure Field'
     }
     field_name = mode_titles.get(mode, 'Flow Field')
     title_str = f"Cylinder Flow - {field_name}"
@@ -249,8 +243,10 @@ def plot_cylinder_flow(u: np.ndarray,
         # Mask the obstacle region to avoid plotting it
         p_masked[obstacle_mask] = np.nan
         
-        cf = plt.contourf(X, Y, p_masked, levels=100, cmap='coolwarm')
+        cf = plt.contourf(X, Y, p_masked, alpha=0.5, cmap='turbo')
         plt.colorbar(cf, label='Pressure (Pa)')
+        plt.contour(X, Y, p_masked, cmap='turbo')
+        plt.streamplot(X, Y, u, v, color='white', linewidth=0.8, density=1.5)
 
     else:
         raise ValueError(f"Invalid mode '{mode}'. Expected 'vorticity', 'velocity', or 'pressure'.")
