@@ -53,7 +53,7 @@ def run_cavity(reynolds: float = 100.0,
     grid = Grid(lx=lx, ly=ly, nx=nx, ny=ny)
     sim = CavitySimulation(grid=grid, rho=rho, nu=nu, dt=0.001)
 
-    print("Running Navier-Stokes solver (adaptive time-stepping)...")
+    print("Running Navier-Stokes solver...")
     u, v, p = sim.solve(t_end=t_end)
     print(f"Simulation completed! Simulated physical time: {sim.t:.3f} s\n")
 
@@ -119,7 +119,7 @@ def run_cylinder(reynolds: float = 100.0,
                              cylinder_center=center, cylinder_radius=radius,
                              u_inlet=u_inlet)
 
-    print("Running Navier-Stokes solver (wake dynamics & vortex shedding)...")
+    print("Running Navier-Stokes solver...")
     u, v, p = sim.solve(t_end=t_end)
     print(f"Simulation completed! Simulated physical time: {sim.t:.3f} s\n")
 
