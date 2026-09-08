@@ -11,10 +11,10 @@ Welcome to NAVTILVS
 
 **NAVTILVS** (**NAV**\ ier-Stokes **T**\ wo-dimensional **I**\ ncompressib\ **L**\ e **V**\ isual **S**\ olver) is a Python library designed to simulate and visualize 2D incompressible fluid flows using finite difference methods on structured Cartesian grids.
 
-.. figure:: /_static/cylinder_velocity.png
+.. figure:: /_static/cylinder_vorticity.png
    :align: center
    :width: 90%
-   :alt: Cylinder Wake Velocity Field
+   :alt: Cylinder Wake Vorticity Field
 
    *Flow past a circular cylinder (Re = 100): Kármán vortex street resolved with the upwind finite difference scheme.*
 
@@ -262,17 +262,17 @@ Lid-Driven Cavity Flow (:math:`Re = 100`, :math:`t = 2.50\text{ s}`)
    :width: 80%
    :alt: Lid-Driven Cavity Streamlines & Pressure Field
 
-   **Streamlines & Pressure Field**: Velocity streamlines and pressure contours depicting corner stagnation zones and recirculation.
+   **Streamlines & Pressure Field**: Velocity streamlines overlaid on pressure contour field depicting corner stagnation zones and the central vortex depression.
+
+.. figure:: /_static/cavity_vorticity.png
+   :align: center
+   :width: 80%
+   :alt: Lid-Driven Cavity Vorticity Field
+
+   **Vorticity Field**: Symmetric vorticity distribution highlighting intense shear layers beneath the moving upper lid and recirculating vortex structures.
 
 Flow Past a Circular Cylinder (:math:`Re = 100`, :math:`t = 3.50\text{ s}`)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. figure:: /_static/cylinder_vorticity.png
-   :align: center
-   :width: 95%
-   :alt: Cylinder Wake Vorticity Field
-
-   **Vorticity Field**: Alternating vortex street demonstrating boundary layer detachment and Kármán wake dynamics.
 
 .. figure:: /_static/cylinder_velocity.png
    :align: center
@@ -287,6 +287,13 @@ Flow Past a Circular Cylinder (:math:`Re = 100`, :math:`t = 3.50\text{ s}`)
    :alt: Cylinder Streamlines & Pressure Field
 
    **Streamlines & Pressure Field**: Velocity streamlines overlaid on pressure field, highlighting upstream stagnation, lateral acceleration, and wake recirculation.
+
+.. figure:: /_static/cylinder_vorticity.png
+   :align: center
+   :width: 95%
+   :alt: Cylinder Wake Vorticity Field
+
+   **Vorticity Field**: Alternating vortex street demonstrating boundary layer detachment and Kármán wake dynamics.
 
 Testing Suite
 -------------
