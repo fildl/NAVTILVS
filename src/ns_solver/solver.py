@@ -65,7 +65,8 @@ def pressure_poisson(p : np.ndarray,
                      dy : float,
                      b : np.ndarray,
                      boundary_conditions,
-                     max_iter : int = 500
+                     max_iter : int = 500,
+                     tol : float = None
                      ) -> np.ndarray:
     """
     Solve the Poisson equation for pressure :math:`p`.
@@ -84,6 +85,9 @@ def pressure_poisson(p : np.ndarray,
         Function ``bc(p) -> np.ndarray`` applying boundary conditions to the pressure field.
     max_iter : int, default=500
         Maximum number of iterations.
+    tol : float, optional
+        Convergence threshold based on the :math:`L_\\infty` norm (:math:`\\max |p - p_n|`).
+        If None, iterations run up to `max_iter`.
 
     Returns
     -------
@@ -112,6 +116,10 @@ def pressure_poisson(p : np.ndarray,
 
         # Apply boundary conditions
         p = boundary_conditions(p)
+
+        # Exit if change between two consecutive iterations is below tolerance
+        if tol is not None and np.max(np.abs(p - pn)) < tol:
+            break
 
     return p
 
