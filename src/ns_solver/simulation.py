@@ -4,7 +4,7 @@
 __author__ = ['Filippo Di Ludovico']
 __email__ = ['filippo.diludovico@studio.unibo.it']
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import numpy as np
 from .grid import Grid
 from .solver import build_up_b, pressure_poisson, update_velocity
@@ -24,6 +24,11 @@ class SimulationClass:
         Kinematic viscosity.
     dt : float
         Initial time step size.
+    p_max_iter : int, default=500
+        Maximum number of pressure Poisson iterations per time step.
+    p_tol : float or None, default=None, optional
+        Convergence tolerance on maximum pressure field change (:math:`L_\\infty` norm).
+        If None, iterations run up to `p_max_iter`.
 
     Attributes
     ----------
@@ -43,6 +48,9 @@ class SimulationClass:
     rho  : float
     nu   : float
     dt   : float
+    p_max_iter: int = field(default=500, kw_only=True)
+    p_tol: float | None = field(default=None, kw_only=True)
+    # kw_only=True prevents dataclass inheritance conflicts with subclasses positional arguments.
 
     def __post_init__(self):
         """
@@ -56,6 +64,10 @@ class SimulationClass:
             raise ValueError("Viscosity must be strictly positive.")
         if self.dt <= 0:
             raise ValueError("Time step (dt) must be strictly positive.")
+        if self.p_max_iter <= 0:
+            raise ValueError("Maximum Poisson iterations (p_max_iter) must be strictly positive.")
+        if self.p_tol is not None and self.p_tol <= 0:
+            raise ValueError("Pressure convergence tolerance (p_tol) must be strictly positive.")
         
         # Store the input time step for compute dynamic time stepping
         self.dt_max = self.dt
@@ -182,7 +194,9 @@ class SimulationClass:
         self.p = pressure_poisson(self.p,
                                   dx, dy,
                                   b,
-                                  self.pressure_bc)
+                                  self.pressure_bc,
+                                  max_iter=self.p_max_iter,
+                                  tol=self.p_tol)
         
         # Update velocity
         self.u, self.v = update_velocity(self.u, self.v,
