@@ -57,12 +57,11 @@ def run_cavity(reynolds: float = 100.0,
     u, v, p = sim.solve(t_end=t_end)
     print(f"Simulation completed! Simulated physical time: {sim.t:.3f} s\n")
 
-    # Generate all four diagnostic plots
+    # Generate diagnostic plots
     modes = [
         ('velocity', 'cavity_velocity.png'),
-        ('stream', 'cavity_flow.png'),
-        ('vorticity', 'cavity_vorticity.png'),
         ('pressure', 'cavity_pressure.png'),
+        ('vorticity', 'cavity_vorticity.png'),
     ]
 
     for mode, filename in modes:
