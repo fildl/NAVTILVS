@@ -154,7 +154,7 @@ The script ``main.py`` provides a command-line entrypoint to configure, run, and
 
 1. **Lid-Driven Cavity Benchmark**:
 
-   Runs the square cavity problem and generates 4 plots:
+   Runs the square cavity problem and generates 3 plots:
 
    .. code-block:: bash
 
@@ -163,9 +163,8 @@ The script ``main.py`` provides a command-line entrypoint to configure, run, and
    Generated files in ``imgs/``:
 
    * ``cavity_velocity.png``: Velocity magnitude field ('turbo' colormap) overlaid with directional quiver vectors.
-   * ``cavity_flow.png``: Velocity streamlines overlaid on pressure contour field ('turbo' colormap).
+   * ``cavity_pressure.png``: Velocity streamlines overlaid on pressure contour field ('turbo' colormap).
    * ``cavity_vorticity.png``: Vorticity field with symmetric 'coolwarm' colormap highlighting recirculating vortex cores.
-   * ``cavity_pressure.png``: Pressure field distribution with 'coolwarm' colormap.
 
 2. **Flow Past a Circular Cylinder**:
 
@@ -179,7 +178,7 @@ The script ``main.py`` provides a command-line entrypoint to configure, run, and
 
    * ``cylinder_vorticity.png``: Vorticity field with symmetric 'coolwarm' colormap, resolving alternating Kármán vortex street shedding.
    * ``cylinder_velocity.png``: Velocity magnitude field ('turbo' colormap) overlaid with streamlines and recirculation bubbles.
-   * ``cylinder_pressure.png``: Pressure field with 'coolwarm' colormap, highlighting upstream stagnation front and low-pressure wake depression.
+   * ``cylinder_pressure.png``: Velocity streamlines overlaid on pressure contour field ('turbo' colormap) and masked cylinder obstacle.
 
 3. **Custom Resolution & High Reynolds Number**:
 
@@ -258,10 +257,10 @@ Lid-Driven Cavity Flow (:math:`Re = 100`, :math:`t = 2.50\text{ s}`)
 
    **Velocity Field**: Velocity magnitude field overlaid with directional velocity vectors, showing the primary vortex centered at :math:`(x \approx 0.62\text{ m}, y \approx 0.78\text{ m})`.
 
-.. figure:: /_static/cavity_flow.png
+.. figure:: /_static/cavity_pressure.png
    :align: center
    :width: 80%
-   :alt: Lid-Driven Cavity Streamlines
+   :alt: Lid-Driven Cavity Streamlines & Pressure Field
 
    **Streamlines & Pressure Field**: Velocity streamlines and pressure contours depicting corner stagnation zones and recirculation.
 
@@ -285,9 +284,9 @@ Flow Past a Circular Cylinder (:math:`Re = 100`, :math:`t = 3.50\text{ s}`)
 .. figure:: /_static/cylinder_pressure.png
    :align: center
    :width: 95%
-   :alt: Cylinder Pressure Field
+   :alt: Cylinder Streamlines & Pressure Field
 
-   **Pressure Field**: High-pressure stagnation zone on the upstream face and low-pressure wake zone.
+   **Streamlines & Pressure Field**: Velocity streamlines overlaid on pressure field, highlighting upstream stagnation, lateral acceleration, and wake recirculation.
 
 Testing Suite
 -------------

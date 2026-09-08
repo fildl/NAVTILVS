@@ -101,7 +101,7 @@ python main.py --sim cylinder
 python main.py --sim cavity --re 200 --nx 256 --ny 256 --tend 5.0 --output-dir imgs
 ```
 
-All plots (velocity, streamlines, vorticity, pressure) are automatically exported to the target directory (`imgs/` by default).
+All plots (velocity, pressure with streamlines, and vorticity) are automatically exported to the target directory (`imgs/` by default).
 
 ### 2. Python API
 
