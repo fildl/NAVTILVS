@@ -76,6 +76,17 @@ def test_compute_vorticity_limits_all_zeros():
     limit, extend = _compute_vorticity_limits(vort, vlim=None, clip_percentile=98.0)
     assert limit == 1.0
 
+def test_compute_vorticity_limits_with_nan():
+    """
+    Test that NaNs (e.g. inside obstacles) are properly ignored.
+    """
+
+    vort = np.array([[np.nan, 2.0], [-8.0, np.nan]])
+
+    limit, extend = _compute_vorticity_limits(vort, vlim=None, clip_percentile=None)
+    assert limit == 8.0
+    assert extend == 'neither'
+
 def test_plot_cavity_flow_invalid_mode():
     """
     Validate that plot_cavity_flow raises ValueError when passed an unsupported mode.
@@ -159,6 +170,17 @@ def test_compute_pressure_limits_constant_field():
 
     bounds, extend = _compute_pressure_limits(p, vlim=None, clip_percentile=None)
     assert bounds == (4.0, 6.0)
+
+def test_compute_pressure_limits_with_nan():
+    """
+    Test that NaNs are ignored when computing pressure limits.
+    """
+    
+    p = np.array([[np.nan, -2.0], [3.0, np.nan]])
+
+    bounds, extend = _compute_pressure_limits(p, vlim=None, clip_percentile=None)
+    assert bounds == (-2.0, 3.0)
+    assert extend == 'neither'
 
 def test_plot_cylinder_flow_invalid_mode():
     """

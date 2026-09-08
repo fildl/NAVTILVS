@@ -460,3 +460,32 @@ def test_cylinder_reynolds_number():
     # Re = (u_inlet * D) / nu = (1.5 * 0.1) / 0.02 = 7.5
     expected_re = (1.5 * 0.1) / 0.02
     assert np.isclose(sim.reynolds_number, expected_re)
+
+def test_cylinder_simulation_solve():
+    """
+    Test that CylinderSimulation.solve executes correctly and fields remain finite and stable.
+    """
+
+    grid = Grid(lx=2.0, ly=0.5, nx=32, ny=16)
+    sim = CylinderSimulation(
+        grid=grid,
+        rho=1.0,
+        nu=0.1,
+        dt=0.001,
+        cylinder_center=(0.5, 0.25),
+        cylinder_radius=0.05,
+        u_inlet=1.0
+    )
+
+    u, v, p = sim.solve(nt=20)
+
+    # Simulation time must have progressed
+    assert sim.t > 0.0
+
+    # Solution fields must remain finite (no NaN or Inf divergence)
+    assert np.all(np.isfinite(u))
+    assert np.all(np.isfinite(v))
+    assert np.all(np.isfinite(p))
+
+    # Flow should not blow up
+    assert np.max(np.abs(u)) < 10.0 * sim.u_inlet
