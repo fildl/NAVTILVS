@@ -123,6 +123,8 @@ def plot_cavity_flow(u: np.ndarray,
     """
     Plot the flow field inside a lid-driven cavity.
 
+    Render cavity velocity magnitude overlaid with quiver vectors, pressure contours with streamlines, and symmetric vorticity fields.
+
     Parameters
     ----------
     u : np.ndarray
@@ -261,8 +263,8 @@ def plot_cylinder_flow(u: np.ndarray,
     r"""
     Plot the flow field around a cylinder.
 
-    This function generates a visualization of the pressure, velocity,
-    or vorticity field around the cylinder.
+    Render channel flow past the cylinder obstacle with velocity streamlines,
+    pressure contour fields, and vorticity fields, while masking the cylinder region.
 
     Parameters
     ----------

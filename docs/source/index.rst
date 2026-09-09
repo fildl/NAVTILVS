@@ -257,7 +257,7 @@ Lid-Driven Cavity Flow (:math:`Re = 100`, :math:`t = 2.50\text{ s}`)
    :width: 80%
    :alt: Lid-Driven Cavity Velocity Field
 
-   **Velocity Field**: Velocity magnitude field overlaid with directional velocity vectors, showing the primary vortex centered at :math:`(x \approx 0.62\text{ m}, y \approx 0.78\text{ m})`.
+   **Velocity Field**: Velocity magnitude field overlaid with velocity vectors, showing the primary vortex centered at :math:`(x \approx 0.62\text{ m}, y \approx 0.78\text{ m})`.
 
 .. figure:: /_static/cavity_pressure.png
    :align: center
@@ -288,7 +288,7 @@ Flow Past a Circular Cylinder (:math:`Re = 100`, :math:`t = 3.50\text{ s}`)
    :width: 95%
    :alt: Cylinder Streamlines & Pressure Field
 
-   **Streamlines & Pressure Field**: Velocity streamlines overlaid on pressure field, highlighting upstream stagnation, lateral acceleration, and wake recirculation.
+   **Streamlines & Pressure Field**: Velocity streamlines overlaid on pressure field.
 
 .. figure:: /_static/cylinder_vorticity.png
    :align: center
@@ -335,3 +335,4 @@ References
 
 1. Barba, L. A., & Forsyth, G. F. (2018). *CFD Python: the 12 steps to Navier-Stokes equations*. Journal of Open Source Education, 1(9), 21. `https://doi.org/10.21105/jose.00021 <https://doi.org/10.21105/jose.00021>`_
 2. Hirsch, C. (2007). *Numerical Computation of Internal and External Flows: The Fundamentals of Computational Fluid Dynamics* (Second Edition). Butterworth-Heinemann.
+3. Pope, S. B. (2000). *Turbulent Flows*. Cambridge University Press. `https://doi.org/10.1017/CBO9780511840531 <https://doi.org/10.1017/CBO9780511840531>`_

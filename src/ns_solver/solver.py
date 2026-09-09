@@ -135,7 +135,7 @@ def update_velocity(u : np.ndarray,
                     nu : float
                     ) -> tuple[np.ndarray, np.ndarray]:
     """
-    Solve momentum equation for both components.
+    Solve momentum equation for both velocity components.
     
     Discretizes the Navier-Stokes momentum equations in time.
     To ensure numerical stability, convective terms are discretized using a first-order Upwind scheme:

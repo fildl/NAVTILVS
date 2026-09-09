@@ -61,7 +61,7 @@ where the source term :math:`b` is defined by:
    \left(\frac{\partial v}{\partial y}\right)^2
    \right] + \frac{\rho}{\Delta t} \left(\frac{\partial u}{\partial x} + \frac{\partial v}{\partial y}\right)
 
-The second term on the right-hand side represents compressibility/divergence correction, preventing the numerical accumulation of dilatation errors over time.
+The second term on the right-hand side represents compressibility/divergence correction, preventing the numerical accumulation of dilatation errors over time (Barba & Forsyth, 2018) [1]_.
 
 Point-Jacobi Relaxation and Convergence Criteria
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -138,7 +138,7 @@ where:
 .. math::
    \nu_{\text{num}} = \frac{|u| \Delta x}{2}
 
-This intrinsic **numerical viscosity** (:math:`\nu_{\text{num}}`) stabilizes the discrete equations at high Reynolds numbers by damping high-frequency spatial oscillations, enabling stable computations at Reynolds numbers previously unattainable with unconditioned schemes.
+This intrinsic **numerical viscosity** (:math:`\nu_{\text{num}}`) stabilizes the discrete equations at high Reynolds numbers by damping high-frequency spatial oscillations, enabling stable computations at Reynolds numbers previously unattainable with unconditioned schemes (Hirsch, 2007) [2]_ (Pope, 2000) [3]_.
 
 .. _numerical_stability:
 
@@ -216,7 +216,7 @@ The physical flow regimes past a circular cylinder vary drastically with :math:`
 * (:math:`47 \le Re < 180`):
   The steady wake undergoes a bifurcation; alternating vortices detach periodically.
 * (:math:`Re > 180`):
-  In physical experiments, secondary three-dimensional instabilities emerge, transitioning toward turbulence. Because **NAVTILVS** solves the two-dimensional Navier–Stokes equations, it cannot capture spanwise vortex stretching.
+  In physical experiments, secondary three-dimensional instabilities emerge, transitioning toward turbulence. Because **NAVTILVS** solves the two-dimensional Navier–Stokes equations, it cannot capture spanwise vortex stretching (Pope, 2000) [3]_.
 
 .. _boundary_conditions:
 .. _obstacle_modeling:
@@ -334,3 +334,4 @@ References
 
 .. [1] Barba, L. A., & Forsyth, G. F. (2018). *CFD Python: the 12 steps to Navier-Stokes equations*. Journal of Open Source Education, 1(9), 21. `https://doi.org/10.21105/jose.00021 <https://doi.org/10.21105/jose.00021>`_
 .. [2] Hirsch, C. (2007). *Numerical Computation of Internal and External Flows: The Fundamentals of Computational Fluid Dynamics* (Second Edition). Butterworth-Heinemann.
+.. [3] Pope, S. B. (2000). *Turbulent Flows*. Cambridge University Press. `https://doi.org/10.1017/CBO9780511840531 <https://doi.org/10.1017/CBO9780511840531>`_
