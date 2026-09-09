@@ -170,3 +170,4 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 1. Barba, L. A., & Forsyth, G. F. (2018). *CFD Python: the 12 steps to Navier-Stokes equations*. Journal of Open Source Education, 1(9), 21. [https://doi.org/10.21105/jose.00021](https://doi.org/10.21105/jose.00021)
 2. Hirsch, C. (2007). *Numerical Computation of Internal and External Flows: The Fundamentals of Computational Fluid Dynamics* (Second Edition). Butterworth-Heinemann.
+3. Pope, S. B. (2000). *Turbulent Flows*. Cambridge University Press. [https://doi.org/10.1017/CBO9780511840531](https://doi.org/10.1017/CBO9780511840531)
